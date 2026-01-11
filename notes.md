@@ -49,6 +49,42 @@ emojis
 :wink:
 ^these arent working for preview so hoepuflly they do online
 
+
+## Terminal notes
+
+For this class they reccomend git bash terminal but WSL would work which I have downloaded. Might be good idea to study more on what WSL actually is.
+1. echo - Output the parameters of the command
+2. cd - Change directory
+3. mkdir - Make directory
+4. rmdir - Remove directory
+5. rm - Remove file(s)
+6. mv - Move file(s)
+7. cp - Copy files
+8. ls - List files
+9. curl - Command line client URL browser
+10. grep - Regular expression search
+11. find - Find files
+12. top - View running processes with CPU and memory usage
+13. df - View disk statistics
+14. cat - Output the contents of a file
+15. less - Interactively output the contents of a file
+16. wc - Count the words in a file
+17. ps - View the currently running processes
+18. kill - Kill a currently running process
+19. sudo - Execute a command as a super user (admin)
+20. ssh - Create a secure shell on a remote computer
+21. scp - Securely copy files to a remote computer
+22. history - Show the history of commands
+23. ping - Check if a website is up
+24. tracert - Trace the connections to a website
+25. dig - Show the DNS information for a domain
+26. man - Look up a command in the manual
+
+1. | - Take the output from the command on the left and pipe, or pass, it to the command on the right
+2. \> - Redirect output to a file. Overwrites the file if it exists
+3. \>> - Redirect output to a file. Appends if the file exists
+
+
 ## Helpful links
 
 - [Course instruction](https://github.com/webprogramming260)
