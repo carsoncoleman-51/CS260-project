@@ -10,9 +10,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [X] Proper use of Markdown
 - [X] A concise and compelling elevator pitch
-- [ ] Description of key features
-- [ ] Description of how you will use each technology
-- [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+- [X] Description of key features
+- [X] Description of how you will use each technology
+- [X] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ### Elevator pitch
 
@@ -20,33 +20,53 @@ You ever wanted the thrill of gambling in a harmless yet satisfying way? The But
 
 ### Design
 
-![Design image](placeholder.png)
+![Design image](design-image-button-game.png)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Here is a diagram showing how a user would interact with the backend to update and retrieve leaderboard scores.
 
 ```mermaid
 sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
+    actor Player
+    participant React
+    participant Server
+    participant Database
+    participant WebSocket
+
+    Player->>React: Press big red button
+    React->>React: Win or lose is calculated
+
+    alt Player keeps winning
+        React-->>Player: Increase win streak (local only)
+    else Player loses
+        React->>Server: Send final win streak
+        Server->>Database: Store score
+        Database-->>Server: Confirm save
+        Server-->>WebSocket: Broadcast updated leaderboard
+        WebSocket-->>React: Push new leaderboard
+        React-->>Player: Show updated leaderboard
+    end
 ```
+
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- Secure login
+- Random probability logic for win/loss
+- Keeps track of win streak
+- High scores are persistently updated
+- Ability to logout and delete account
+
 
 ### Technologies
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** - There will be two HTML pages: one for the login and account creation screen, and one for the main game interface
+- **CSS** - CSS will be used to style the game with consistent colors, spacinga nd responsive layout so it looks good on different screen sizes. It will also be used for button animations and visual feedback when the user presses the button
+- **React** - React will be used for the interactive user interface. The game will be split into components such as teh big red button, win streak dispaly, and menu buttons. React will track current win streak and results so when the player press the button, the screen updates instantly. React will also handle the switching between login and game screens
+- **Service** - A backend service will provide endpoints for registering users, logging in and out, saving high scores, and retrieving the leaderboard. the service will also call a third-party API (https://uselessfacts.jsph.pl/) to fetch random facts to display when player wins. 
+- **DB/Login** - This will be used to store authentication information, users' account, user's high scores, and leaderboard
+- **WebSocket** - A WebSocket connnection will be used to send and receive real-time updates of the leaderboard. 
 
 ## 🚀 AWS deliverable
 
