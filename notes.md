@@ -1,6 +1,18 @@
 # CS 260 Notes
 
-[My startup - Simon](https://simon.cs260.click)
+These are all the main git commands and processes that I will probably be using:
+
+**git add** and **git commit** used to locally save progress.
+**git status** shows local saved progress. 
+**git log** is another thing to show local progress but specifically for the commits.
+**Git push** is used when you want your local progress to be saved to the cloud github version.
+**Git pull** makes your local system match the cloud github version automatically. 
+**Git fetch** gets a quick update from the cloud github to see if your local version is different from the cloud github. 
+**git init** creates local repo but dont do that, its easier to make repo on github. To make local version of a project off github use **git clone**. 
+**git branch "name"** creates a new branch but you still stay on the original branch until you change to the new branch you just created. to go to the new branch you do **git checkout "name"**. To merge brances I think easiest way is to go to the original branch which is called main or master (so do that checkout command) then do **git merge "name"** using the name of the other branch. 
+**git diff** is good to show differences between code on different commits, I think there's more to the formating.
+
+- [ ] I Would love to mess around and work more on forking in github which seems like a version of git clone a repositiory but like copying the whole git website project...not sure.
 
 ## Helpful links
 
