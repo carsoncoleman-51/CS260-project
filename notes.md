@@ -90,6 +90,7 @@ For this class they reccomend git bash terminal but WSL would work which I have 
 - [Course instruction](https://github.com/webprogramming260)
 - [Canvas](https://byu.instructure.com)
 - [MDN](https://developer.mozilla.org)
+lol
 
 ## AWS
 
