@@ -1,5 +1,7 @@
 # CS 260 Notes
 
+## GIT Stuff
+
 These are all the main git commands and processes that I will probably be using:
 
 **git add** and **git commit** used to locally save progress.
@@ -13,6 +15,39 @@ These are all the main git commands and processes that I will probably be using:
 **git diff** is good to show differences between code on different commits, I think there's more to the formating.
 
 - [ ] I Would love to mess around and work more on forking in github which seems like a version of git clone a repositiory but like copying the whole git website project...not sure.
+
+## Markup Stuff
+
+this github doc gives good basics on markup stuff [link shortcut](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+
+Here's me practicing:
+
+A quote 
+> "To be or not to be"
+
+an image
+![this is the alt text part of the image](design-image-button-game.png)
+
+lists
+* dog
+* cat
+* horse
+- ruff
+- meow
++ lol
+
+1. hi
+- nested isnt working on preview
+2. bye
+3. yes
+
+- [ ] task box isnt working on preview
+
+
+emojis
+:smiley:
+:wink:
+^these arent working for preview so hoepuflly they do online
 
 ## Helpful links
 
