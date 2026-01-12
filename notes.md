@@ -84,7 +84,7 @@ For this class they reccomend git bash terminal but WSL would work which I have 
 2. \> - Redirect output to a file. Overwrites the file if it exists
 3. \>> - Redirect output to a file. Appends if the file exists
 
-
+For VIM here's command cheat sheet [link](https://vim.rtorr.com/)
 ## Helpful links
 
 - [Course instruction](https://github.com/webprogramming260)
