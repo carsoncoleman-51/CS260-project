@@ -90,12 +90,16 @@ For VIM here's command cheat sheet [link](https://vim.rtorr.com/)
 - [Course instruction](https://github.com/webprogramming260)
 - [Canvas](https://byu.instructure.com)
 - [MDN](https://developer.mozilla.org)
-lol
 
 ## AWS
 
 My IP address is: 44.193.104.163
+to ssh into server use 
+>ssh -i [key pair file] ubuntu@[ip address]
 
+To find an ip address based on domain name use command "dig". To find all the different router ips it goes through you use traceroute. All through ubuntu.
+
+To change a files read/write stuff use chmod 400 [key file] which makes only owner readable or chmod 600 [key file] which makes only owner readable and writable. 
 
 ## Caddy
 
