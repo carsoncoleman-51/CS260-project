@@ -94,6 +94,9 @@ For VIM here's command cheat sheet [link](https://vim.rtorr.com/)
 ## AWS
 
 My IP address is: 44.193.104.163
+
+http://theredbuttongame.click/
+
 to ssh into server use 
 >ssh -i [key pair file] ubuntu@[ip address]
 
