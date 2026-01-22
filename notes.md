@@ -85,6 +85,26 @@ For this class they reccomend git bash terminal but WSL would work which I have 
 3. \>> - Redirect output to a file. Appends if the file exists
 
 For VIM here's command cheat sheet [link](https://vim.rtorr.com/)
+
+:h	help
+i	enter insert mode. This will allow you to type and delete text. Use ESC to exit insert mode. No other commands will work while in insert mode.
+u	undo
+CTRL-r	redo
+gg	go to beginning of file
+G	go to end of file
+/	search for text that you type after /
+n	next search match
+N	previous search match
+v	visually select text
+y	yank or copy selected text to clipboard
+p	paste clipboard
+CTRL-wv	Split window vertically
+CTRL-ww	Toggle windows
+CTRL-wq	Close current window
+:e	Open a file. Type ahead available. If you open a directory you can navigate it in the window
+:w	write file (save)
+:q	quit. Use :q! to exit without saving
+
 ## Helpful links
 
 - [Course instruction](https://github.com/webprogramming260)
@@ -110,9 +130,11 @@ No problems worked just like it said in the [instruction](https://github.com/web
 
 ## HTML
 
-This was easy. I was careful to use the correct structural elements such as header, footer, main, nav, and form. The links between the three views work great using the `a` element.
+so link has form <a href="link stuff"> link text that peeps click on <a>
 
-The part I didn't like was the duplication of the header and footer code. This is messy, but it will get cleaned up when I get to React.
+to include an image <img src='link address part' alt="descriptive text lol'>
+
+
 
 ## CSS
 
