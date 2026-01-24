@@ -78,15 +78,15 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **HTML pages** - I did not complete this part of the deliverable.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - I did not complete this part of the deliverable.
-- [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [ ] **Images** - I did not complete this part of the deliverable.
-- [ ] **Login placeholder** - I did not complete this part of the deliverable.
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [X] **HTML pages** - I create three html pages: index, play, scores.
+- [X] **Proper HTML element usage** - I created a basic structure for my three html pages.
+- [X] **Links** - In the header I created links to link all htmls.
+- [X] **Text** - I populated the htmls with titles and headers to display infromation
+- [X] **3rd party API placeholder** - I have a section for 3rd party random fact on my scores.html.
+- [X] **Images** - I did not complete this part of the deliverable.
+- [X] **Login placeholder** - I added username and password login placeholders.
+- [X] **DB data placeholder** - I added a table to scores page to show all the high scores stored.
+- [X] **WebSocket placeholder** - I added a spot on play page that shows when a player gets a new high score.
 
 ## 🚀 CSS deliverable
 
