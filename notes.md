@@ -163,9 +163,9 @@ printf "\n----> Copy the distribution package to the target.\n"
 scp -r -i "$key" * ubuntu@$hostname:services/$service/public
 ```
 
-so link has form <a href="link stuff"> link text that peeps click on <a>
+so link has form `<a href="link stuff"> link text that peeps click on <a>`
 
-to include an image <img src='link address part' alt="descriptive text'>
+to include an image `<img src='link address part' alt="descriptive text'>`
 
 ## CSS
 
