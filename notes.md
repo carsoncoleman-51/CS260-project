@@ -124,6 +124,8 @@ To find an ip address based on domain name use command "dig". To find all the di
 
 To change a files read/write stuff use chmod 400 [key file] which makes only owner readable or chmod 600 [key file] which makes only owner readable and writable. 
 
+I learned that if I want to use VScode to edit the server then there needs to be more storage on the server for it to download a mini vscode thing on it, but my server is tiny so it cannot do that so that is why you have to use vim. ALSO, when I was trying to ssh to server with vscode chatgpt told me to make a .config file, which for future reference I guess makes signing into server a lot easier and faster. Not totally sure about how it all works.
+
 ## Caddy
 
 No problems worked just like it said in the [instruction](https://github.com/webprogramming260/.github/blob/main/profile/webServers/https/https.md).
