@@ -105,11 +105,9 @@ CTRL-wq	Close current window
 :w	write file (save)
 :q	quit. Use :q! to exit without saving
 
-## Helpful links
+## Class link
 
 - [Course instruction](https://github.com/webprogramming260)
-- [Canvas](https://byu.instructure.com)
-- [MDN](https://developer.mozilla.org)
 
 ## AWS
 
@@ -128,12 +126,11 @@ I learned that if I want to use VScode to edit the server then there needs to be
 
 ## Caddy
 
-No problems worked just like it said in the [instruction](https://github.com/webprogramming260/.github/blob/main/profile/webServers/https/https.md).
+From what I understand, Caddy is a helper for the HTTPS certificate stuff.
 
 ## HTML
 
 ### Deployment script example
-
 ```sh
 #!/bin/bash
 
@@ -168,9 +165,7 @@ scp -r -i "$key" * ubuntu@$hostname:services/$service/public
 
 so link has form <a href="link stuff"> link text that peeps click on <a>
 
-to include an image <img src='link address part' alt="descriptive text lol'>
-
-
+to include an image <img src='link address part' alt="descriptive text'>
 
 ## CSS
 
