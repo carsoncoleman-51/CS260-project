@@ -169,52 +169,19 @@ to include an image `<img src='link address part' alt="descriptive text'>`
 
 ## CSS
 
-This took a couple hours to get it how I wanted. It was important to make it responsive and Bootstrap helped with that. It looks great on all kinds of screen sizes.
+So CSS goes of main structure of html which has elements like ```<p>```. **Elements** can have different **attributes** in it such as **class** names, **id** names, and href which is for links. So there's five ways to assign design rules and it is by choosing a certain combination of Element, Attribute, Class, Id, and the last one is called **Psuedo** selector which has to do with user interaction stuff like a certain design rule will happen if the mouse is hovering over it.
 
-Bootstrap seems a bit like magic. It styles things nicely, but is very opinionated. You either do, or you do not. There doesn't seem to be much in between.
+The next major part are the declarations which occurs only in the css block. So you have your name of your design block saying which part of html is going to get the design, then in {} you put the declartion which is literally just like the actual design choice code.
 
-I did like the navbar it made it super easy to build a responsive header.
+The actual declartions of design can be put directly into html file, but seems like just putting it all in css file for most part is better.
 
-```html
-      <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-          <a class="navbar-brand">
-            <img src="logo.svg" width="30" height="30" class="d-inline-block align-top" alt="" />
-            Calmer
-          </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link active" href="play.html">Play</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="about.html">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="index.html">Logout</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
-```
-
-I also used SVG to make the icon and logo for the app. This turned out to be a piece of cake.
-
-```html
-<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-  <rect width="100" height="100" fill="#0066aa" rx="10" ry="10" />
-  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-size="72" font-family="Arial" fill="white">C</text>
-</svg>
-```
+For fonts you can either uplaod your own and its through ```@font-face``` or you can do it the op way and just use google's stuff which is done through ```@import```s
 
 ## React Part 1: Routing
 
-Setting up Vite and React was pretty simple. I had a bit of trouble because of conflicting CSS. This isn't as straight forward as you would find with Svelte or Vue, but I made it work in the end. If there was a ton of CSS it would be a real problem. It sure was nice to have the code structured in a more usable way.
+there are normal function calls and in-line function (lambda) calls.
+
+Can have javascript maniupulate the html in console in like f12 window ya know. ```document.body.innerHTML "<h1>HELLO</h1>" ``` for example
 
 ## React Part 2: Reactivity
 
