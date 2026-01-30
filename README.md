@@ -94,10 +94,10 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [X] **Visually appealing colors and layout. No overflowing elements.** - Used fun colors for game.
 - [X] **Use of a CSS framework** - I imported bootstrap and used the btn-secondary feature for the login button and create account button.
-- [ ] **All visual elements styled using CSS** - 
-- [ ] **Responsive to window resizing using flexbox and/or grid display** - I did not complete this part of the deliverable.
-- [ ] **Use of a imported font** - I did not complete this part of the deliverable.
-- [ ] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I did not complete this part of the deliverable.
+- [ ] **All visual elements styled using CSS** - used only css to style. It is much easier that way.
+- [X] **Responsive to window resizing using flexbox and/or grid display** - Used multiple methods for resizing, one being flex. I also used the em modifier where text changes size based on size of window. I also used clamp, min widths and min heights.
+- [X] **Use of a imported font** - I used a google font. I added backup fonts as well.
+- [X] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I used element and class selectors for a bunch of editing. I used ID for the title of the page. For the pseudo selector I made the red button shake when you hover close to it or over it. The red button is found on the play page.
 
 ## 🚀 React part 1: Routing deliverable
 
