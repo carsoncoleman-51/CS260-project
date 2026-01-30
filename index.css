@@ -1,0 +1,31 @@
+body {
+  font-family: "Bungee", "Trebuchet MS", sans-serif;
+}
+
+.red-button {
+  position: relative;
+  width: 60vmin;
+  min-width: 180px;
+  max-width: 320px;
+  aspect-ratio: 13 / 7;
+}
+
+.red-button::before {
+  content: "";
+  position: absolute;
+  inset: 4% 10% 0% 10%;
+  background: #9b8f8f;
+  border-radius: 50%;
+  box-shadow: inset 0 -6px 0 #6f6666;
+  z-index: 1;
+}
+
+.red-button-top {
+    position: absolute;
+    inset: 0% 15% 12% 15%;
+    background: #ff1a1a;
+    border-radius: 50%;
+    box-shadow: inset 0 -10px 0 #b00000, 0 6px 0 #5c0000;
+    z-index: 2;
+    cursor: pointer;
+  }

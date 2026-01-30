@@ -171,11 +171,13 @@ to include an image `<img src='link address part' alt="descriptive text'>`
 
 So CSS goes of main structure of html which has elements like ```<p>```. **Elements** can have different **attributes** in it such as **class** names, **id** names, and href which is for links. So there's five ways to assign design rules and it is by choosing a certain combination of Element, Attribute, Class, Id, and the last one is called **Psuedo** selector which has to do with user interaction stuff like a certain design rule will happen if the mouse is hovering over it.
 
-The next major part are the declarations which occurs only in the css block. So you have your name of your design block saying which part of html is going to get the design, then in {} you put the declartion which is literally just like the actual design choice code.
+The next major part are the **declarations** which occurs only in the css block. So you have your name of your design block saying which part of html is going to get the design, then in {} you put the declaration which is literally just like the actual design choice code. The actual declartions of design can be put directly into html file, but seems like just putting it all in css file for most part is better. The declaration is made up of two parts: the **property** and the **value**. The property is like what design youre changing and the value is the value obviously. 
 
-The actual declartions of design can be put directly into html file, but seems like just putting it all in css file for most part is better.
+For fonts you can either uplaod your own and its through ```@font-face``` or you can do it the op way and just use google's stuff which is done through ```@import```.
 
-For fonts you can either uplaod your own and its through ```@font-face``` or you can do it the op way and just use google's stuff which is done through ```@import```s
+You can do animations with css.
+
+do make sure browsers or others dont mess with your scaling include this meta tag which pretty much tells browser to back off: ```<meta name="viewport" content="width=device-width,initial-scale=1" />```
 
 ## React Part 1: Routing
 
