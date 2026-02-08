@@ -2,16 +2,30 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 24px;
+  padding: 24px 12px 40px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .scores-display-table {
   border: 3px solid #000;
   border-collapse: collapse;
-  margin-bottom: 5px;
+  width: min(520px, 90vw);
+  font-size: clamp(14px, 2.6vw, 18px);
 }
 
 .scores-display-table th,
 .scores-display-table td {
   padding: 8px 16px;
+  text-align: left;
+}
+
+.scores-display-table thead th {
+  font-weight: 700;
+}
+
+.scores-fun-fact {
+  font-size: clamp(13px, 2.6vw, 18px);
+  font-weight: 700;
 }
