@@ -196,7 +196,6 @@ change scripts in package.json to use the vite by doing:
 ```
 make sure node_modules is in .gitignore cuz thats where all the different js packages are held and the browser knows how to download it at later time.
 
-
 there are normal function calls and in-line function (lambda) calls. lambda also called arrow calls. An example would be ```varFunction = (input1, input2) => input1 + input2;```, so now varFunction halds that function. kinda crazy. 
 
 
