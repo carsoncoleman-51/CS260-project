@@ -113,8 +113,8 @@ nav a {
   width: min(60vmin, 100%);
   max-width: 320px;
   aspect-ratio: 13 / 7;
-  margin-top: 100px;
-  margin-bottom: 100px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .red-button::before {
@@ -160,7 +160,7 @@ table td {
 }
 
 table {
-  margin-bottom: 50px;
+  margin-bottom: 5px;
 }
 
 .player-name {

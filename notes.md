@@ -181,9 +181,25 @@ do make sure browsers or others dont mess with your scaling include this meta ta
 
 ## React Part 1: Routing
 
-there are normal function calls and in-line function (lambda) calls.
+to get node and npm and vite and all that set up run these commands:
+```npm init -y```
+```npm install vite@latest -D```
+```npm install bootstrap react-bootstrap```
+```npm install react react-dom react-router-dom```
 
-Can have javascript maniupulate the html in console in like f12 window ya know. ```document.body.innerHTML "<h1>HELLO</h1>" ``` for example
+
+change scripts in package.json to use the vite by doing:
+```
+"dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+```
+make sure node_modules is in .gitignore cuz thats where all the different js packages are held and the browser knows how to download it at later time.
+
+
+there are normal function calls and in-line function (lambda) calls. lambda also called arrow calls. An example would be ```varFunction = (input1, input2) => input1 + input2;```, so now varFunction halds that function. kinda crazy. 
+
+
 
 ## React Part 2: Reactivity
 
