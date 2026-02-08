@@ -3,9 +3,9 @@ import './login.css';
 
 export function Login() {
   return (
-    <main className="container-fluid bg-secondary text-center">
+    <main className="login-view container-fluid bg-secondary text-center">
     <h1 className="welcome-statement">Welcome to THE RED BUTTON GAME!</h1>
-        <img src='./public/red_button_image.png' alt="Red Button" className="red-button-image" style={{maxWidth: '400px', width: '100%', height: 'auto'}} />
+        <img src='./public/red_button_image.png' alt="Red Button" className="red-button-image" />
         <form method="get" action="play.html">
           <div>
             <span>Username:</span>

@@ -3,7 +3,7 @@ import './scores.css';
 
 export function Scores() {
   return (
-    <main>
+    <main className="scores-view">
        <table className="scores-display-table">
     <thead>
         <tr>

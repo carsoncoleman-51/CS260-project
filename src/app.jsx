@@ -9,9 +9,9 @@ import { Scores } from './scores/scores';
 export default function App() {
   return (
     <BrowserRouter>
-        <div>
+        <div className="app-shell">
             <header> 
-                <h1 id="game-title">THE <span class="red-word">RED</span> BUTTON GAME</h1>
+                <h1 id="game-title">THE <span className="red-word">RED</span> BUTTON GAME</h1>
                 <nav>
                     <ul>
                         <li><NavLink to="/">Login</NavLink></li>
@@ -21,7 +21,7 @@ export default function App() {
                 </nav>
             </header>
 
-            <main> 
+            <main className="app-main"> 
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/play" element={<Play />} />

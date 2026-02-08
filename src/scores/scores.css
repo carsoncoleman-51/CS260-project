@@ -1,0 +1,17 @@
+.scores-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.scores-display-table {
+  border: 3px solid #000;
+  border-collapse: collapse;
+  margin-bottom: 5px;
+}
+
+.scores-display-table th,
+.scores-display-table td {
+  padding: 8px 16px;
+}

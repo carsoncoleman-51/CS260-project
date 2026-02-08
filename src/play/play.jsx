@@ -3,7 +3,7 @@ import './play.css';
 
 export function Play() {
   return (
-    <main className="container-fluid bg-secondary text-center">
+    <main className="play-view container-fluid bg-secondary text-center">
     <div className="Players">
             Player:
             <span className="player-name">*players name*</span>
