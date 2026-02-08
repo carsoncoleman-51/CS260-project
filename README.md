@@ -103,9 +103,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Bundled using Vite** - I did not complete this part of the deliverable.
-- [ ] **Components** - I did not complete this part of the deliverable.
-- [ ] **Router** - I did not complete this part of the deliverable.
+- [X] **Bundled using Vite** - used Vite by adding it into scripts of json file
+- [X] **Components** - Created my login, play,and scores components. Used React's Router components. Used some of bootstrap's React components.
+- [X] **Router** - Used BrowserRouter to form a routing that routes components. Uses NavLink and Route.
 
 ## 🚀 React part 2: Reactivity deliverable
 

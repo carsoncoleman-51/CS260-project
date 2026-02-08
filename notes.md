@@ -187,7 +187,6 @@ to get node and npm and vite and all that set up run these commands:
 ```npm install bootstrap react-bootstrap```
 ```npm install react react-dom react-router-dom```
 
-
 change scripts in package.json to use the vite by doing:
 ```
 "dev": "vite",
@@ -198,7 +197,7 @@ make sure node_modules is in .gitignore cuz thats where all the different js pac
 
 there are normal function calls and in-line function (lambda) calls. lambda also called arrow calls. An example would be ```varFunction = (input1, input2) => input1 + input2;```, so now varFunction halds that function. kinda crazy. 
 
-
+to push to server this is command: ```./deployReact.sh -k ~/.ssh/carson.aws.pem -h theredbuttongame.click -s startup```
 
 ## React Part 2: Reactivity
 
