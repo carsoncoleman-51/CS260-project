@@ -14,18 +14,7 @@ export function Play() {
     if (!usersText) return [];
     try {
       const parsed = JSON.parse(usersText);
-      if (Array.isArray(parsed)) {
-        return parsed;
-      }
-      if (parsed && typeof parsed === 'object') {
-        return Object.entries(parsed).map(([name, password]) => ({
-          name,
-          password: password ?? '',
-          score: 0,
-          date: '',
-        }));
-      }
-      return [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       return [];
     }
@@ -124,10 +113,33 @@ function PlayerPanel({ userName, isLoggedIn, score, personalBest, authMessage, o
 }
 
 function HighScoreNotifications() {
+  const [events, setEvents] = React.useState([]);
+  const nameIndexRef = React.useRef(0);
+  const sampleNames = ['Eich', 'Ada', 'Linus', 'Grace', 'Alan'];
+
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      const score = Math.floor(Math.random() * 30);
+      const date = new Date().toLocaleDateString();
+      const userName = sampleNames[nameIndexRef.current % sampleNames.length];
+      nameIndexRef.current += 1;
+      setEvents((prev) => [{ name: userName, score, date }, ...prev].slice(0, 2));
+    }, 5000);
+
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div className="notifications">
-      <div>*player1* got a new high score!</div>
-      <div>*player2* got a new high score!</div>
+      {events.length ? (
+        events.map((event, index) => (
+          <div key={`${event.name}-${event.date}-${index}`}>
+            {event.name} got a new high score! {event.score}
+          </div>
+        ))
+      ) : (
+        <div>No recent high scores.</div>
+      )}
     </div>
   );
 }

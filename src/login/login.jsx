@@ -12,18 +12,7 @@ export function Login() {
     if (!usersText) return [];
     try {
       const parsed = JSON.parse(usersText);
-      if (Array.isArray(parsed)) {
-        return parsed;
-      }
-      if (parsed && typeof parsed === 'object') {
-        return Object.entries(parsed).map(([name, password]) => ({
-          name,
-          password: password ?? '',
-          score: 0,
-          date: '',
-        }));
-      }
-      return [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       return [];
     }
