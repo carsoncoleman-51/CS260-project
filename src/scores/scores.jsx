@@ -37,7 +37,7 @@ export function Scores() {
 
   const scoreRows = [];
   if (scores.length) {
-    for (const [i, score] of scores.entries()) {
+    for (const [i, score] of scores.slice(0, 10).entries()) {
       scoreRows.push(
         <tr key={i}>
           <td>{i}</td>

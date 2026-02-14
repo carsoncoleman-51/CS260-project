@@ -5,6 +5,7 @@ import './login.css';
 export function Login() {
   const navigate = useNavigate();
   const [authMessage, setAuthMessage] = React.useState('');
+  const [isLoggedIn, setIsLoggedIn] = React.useState(Boolean(localStorage.getItem('userName')));
 
   const loadUsers = () => {
     const usersText = localStorage.getItem('users');
@@ -44,6 +45,7 @@ export function Login() {
     localStorage.setItem('userName', username);
     localStorage.setItem('authMode', 'login');
     setAuthMessage('');
+    setIsLoggedIn(true);
     navigate('/play');
   };
 
@@ -58,7 +60,7 @@ export function Login() {
     }
     const users = loadUsers();
     if (users[username]) {
-      setAuthMessage('Username already exists, please press login button instead.');
+      setAuthMessage('Username already exists.');
       return;
     }
     users[username] = password;
@@ -66,12 +68,20 @@ export function Login() {
     localStorage.setItem('userName', username);
     localStorage.setItem('authMode', 'create');
     setAuthMessage('');
+    setIsLoggedIn(true);
     navigate('/play');
   };
 
   const handleEnterSubmit = (event) => {
     event.preventDefault();
     setAuthMessage('If you just pressed enter I am sorry but you need to click the button yourself sorry');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userName');
+    localStorage.removeItem('authMode');
+    setIsLoggedIn(false);
+    setAuthMessage('Logged out.');
   };
 
   return (
@@ -113,6 +123,11 @@ export function Login() {
           >
             CREATE ACCOUNT
           </button>
+          {isLoggedIn ? (
+            <button type="button" className="btn btn-secondary login-button" onClick={handleLogout}>
+              LOGOUT
+            </button>
+          ) : null}
         </div>
         {authMessage ? <div className="login-message">{authMessage}</div> : null}
       </form>
