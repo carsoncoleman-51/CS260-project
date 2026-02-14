@@ -2,67 +2,50 @@ import React from 'react';
 import './scores.css';
 
 export function Scores() {
+
+  const [scores, setScores] = React.useState([]);
+
+  // on startup grab scores from local storage
+  React.useEffect(() => {
+    const scoresText = localStorage.getItem('scores');
+    if (scoresText) {
+      setScores(JSON.parse(scoresText));
+    }
+  }, []);
+
+  const scoreRows = [];
+  if (scores.length) {
+    for (const [i, score] of scores.entries()) {
+      scoreRows.push(
+        <tr key={i}>
+          <td>{i}</td>
+          <td>{score.name.split('@')[0]}</td>
+          <td>{score.score}</td>
+          <td>{score.date}</td>
+        </tr>
+      );
+    }
+  } else {
+    scoreRows.push(
+      <tr key='0'>
+        <td colSpan='4'>Be the first to score</td>
+      </tr>
+    );
+  }
+
   return (
     <main className="scores-view">
       <table className="scores-display-table">
-        <thead>
+      <thead className='scores-display-table-header'>
           <tr>
-            <th>Rank</th>
-            <th>Player Name</th>
-            <th>High Score</th>
+            <th>#</th>
+            <th>Name</th>
+            <th>Score</th>
+            <th>Date</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>Player1</td>
-            <td>15</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Player2</td>
-            <td>7</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Player3</td>
-            <td>6</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Player4</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td>Player5</td>
-            <td>4</td>
-          </tr>
-          <tr>
-            <td>6</td>
-            <td>Player6</td>
-            <td>3</td>
-          </tr>
-          <tr>
-            <td>7</td>
-            <td>Player7</td>
-            <td>2</td>
-          </tr>
-          <tr>
-            <td>8</td>
-            <td>Player8</td>
-            <td>2</td>
-          </tr>
-          <tr>
-            <td>9</td>
-            <td>Player9</td>
-            <td>2</td>
-          </tr>
-          <tr>
-            <td>10</td>
-            <td>Player10</td>
-            <td>1</td>
-          </tr>
+        <tbody id='scores'>
+          {scoreRows}
         </tbody>
       </table>
 
@@ -70,3 +53,16 @@ export function Scores() {
     </main>
   );
 }
+
+export function randomFunFact() {
+  const [quote, setQuote] = React.useState('ig it didnt work');
+
+  React.useEffect(() => {
+    setQuote('Show me the code');
+  }, []);
+  return
+}
+
+const funFacts = [
+  
+];  
