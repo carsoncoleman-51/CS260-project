@@ -7,12 +7,70 @@ export function Play() {
 
   const [score, setScore] = React.useState(0);
   const [authMessage, setAuthMessage] = React.useState('');
+  const [personalBest, setPersonalBest] = React.useState(0);
+
+  const loadUsers = () => {
+    const usersText = localStorage.getItem('users');
+    if (!usersText) return [];
+    try {
+      const parsed = JSON.parse(usersText);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+      if (parsed && typeof parsed === 'object') {
+        return Object.entries(parsed).map(([name, password]) => ({
+          name,
+          password: password ?? '',
+          score: 0,
+          date: '',
+        }));
+      }
+      return [];
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const saveUsers = (users) => {
+    localStorage.setItem('users', JSON.stringify(users));
+  };
+
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      setPersonalBest(0);
+      return;
+    }
+    const users = loadUsers();
+    const entry = users.find((user) => user.name === userName);
+    setPersonalBest(entry ? entry.score : 0);
+  }, [isLoggedIn, userName]);
 
   const checkForPersonalHighScore = (currentScore) => {
-    const personalBest = JSON.parse(localStorage.getItem('score') || '0');
-    if (currentScore > personalBest) {
-      localStorage.setItem('score', currentScore);
+    if (!isLoggedIn) {
+      setAuthMessage('Login to save high scores.');
+      return;
+    }
+
+    const users = loadUsers();
+    const entryIndex = users.findIndex((entry) => entry.name === userName);
+    const today = new Date().toLocaleDateString();
+
+    if (entryIndex === -1) {
+      users.unshift({ name: userName, password: '', score: currentScore, date: today });
+      saveUsers(users);
+      setPersonalBest(currentScore);
       setAuthMessage(`New personal high score: ${currentScore}!`);
+      return;
+    }
+
+    const entry = users[entryIndex];
+    if (currentScore > entry.score) {
+      users[entryIndex] = { ...entry, score: currentScore, date: today };
+      saveUsers(users);
+      setPersonalBest(currentScore);
+      setAuthMessage(`New personal high score: ${currentScore}!`);
+    } else {
+      setAuthMessage('No new personal high score.');
     }
   };
 
@@ -31,6 +89,7 @@ export function Play() {
         userName={userName}
         isLoggedIn={isLoggedIn}
         score={score}
+        personalBest={personalBest}
         authMessage={authMessage}
         onButtonPush={buttonPush}
       />
@@ -39,7 +98,7 @@ export function Play() {
   );
 }
 
-function PlayerPanel({ userName, isLoggedIn, score, authMessage, onButtonPush }) {
+function PlayerPanel({ userName, isLoggedIn, score, personalBest, authMessage, onButtonPush }) {
   return (
     <>
       <div className="player-meta">
@@ -47,7 +106,7 @@ function PlayerPanel({ userName, isLoggedIn, score, authMessage, onButtonPush })
           Player: <span className="player-name">{isLoggedIn ? userName : 'Guest'}</span>
         </div>
         <div className="personal-high-score">
-          Personal High Score: <span className="score-value">0</span>
+          Personal High Score: <span className="score-value">{personalBest}</span>
         </div>
       </div>
 
@@ -60,10 +119,6 @@ function PlayerPanel({ userName, isLoggedIn, score, authMessage, onButtonPush })
       </div>
 
       {authMessage ? <div className="login-message">{authMessage}</div> : null}
-      {!isLoggedIn ? (
-        <div className="login-message">Login to save high scores.</div>
-      ) : null}
-
     </>
   );
 }

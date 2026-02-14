@@ -9,18 +9,23 @@ export function Login() {
 
   const loadUsers = () => {
     const usersText = localStorage.getItem('users');
-    if (!usersText) return {};
+    if (!usersText) return [];
     try {
       const parsed = JSON.parse(usersText);
       if (Array.isArray(parsed)) {
-        return parsed.reduce((acc, name) => {
-          acc[name] = '';
-          return acc;
-        }, {});
+        return parsed;
       }
-      return parsed;
+      if (parsed && typeof parsed === 'object') {
+        return Object.entries(parsed).map(([name, password]) => ({
+          name,
+          password: password ?? '',
+          score: 0,
+          date: '',
+        }));
+      }
+      return [];
     } catch (error) {
-      return {};
+      return [];
     }
   };
 
@@ -34,11 +39,12 @@ export function Login() {
       return;
     }
     const users = loadUsers();
-    if (!users[username]) {
+    const user = users.find((entry) => entry.name === username);
+    if (!user) {
       setAuthMessage('Username not found, please create an account.');
       return;
     }
-    if (users[username] !== password) {
+    if (user.password !== password) {
       setAuthMessage('Incorrect password.');
       return;
     }
@@ -59,11 +65,16 @@ export function Login() {
       return;
     }
     const users = loadUsers();
-    if (users[username]) {
-      setAuthMessage('Username already exists.');
+    if (users.some((entry) => entry.name === username)) {
+      setAuthMessage('Username already exists, please press login button instead.');
       return;
     }
-    users[username] = password;
+    users.push({
+      name: username,
+      password,
+      score: 0,
+      date: '',
+    });
     localStorage.setItem('users', JSON.stringify(users));
     localStorage.setItem('userName', username);
     localStorage.setItem('authMode', 'create');

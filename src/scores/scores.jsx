@@ -16,9 +16,24 @@ export function Scores() {
 
   // on startup grab scores from local storage
   React.useEffect(() => {
-    const scoresText = localStorage.getItem('score');
-    if (scoresText) {
-      setScores(JSON.parse(scoresText));
+    const usersText = localStorage.getItem('users');
+    if (usersText) {
+      try {
+        const parsed = JSON.parse(usersText);
+        if (Array.isArray(parsed)) {
+          setScores(parsed);
+        } else if (parsed && typeof parsed === 'object') {
+          const users = Object.entries(parsed).map(([name, password]) => ({
+            name,
+            password: password ?? '',
+            score: 0,
+            date: '',
+          }));
+          setScores(users);
+        }
+      } catch (error) {
+        setScores([]);
+      }
     }
   }, []);
 
@@ -37,13 +52,14 @@ export function Scores() {
 
   const scoreRows = [];
   if (scores.length) {
-    for (const [i, score] of scores.slice(0, 10).entries()) {
+    const sortedScores = [...scores].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    for (const [i, score] of sortedScores.slice(0, 10).entries()) {
       scoreRows.push(
         <tr key={i}>
           <td>{i}</td>
           <td>{score.name.split('@')[0]}</td>
-          <td>{score.score}</td>
-          <td>{score.date}</td>
+          <td>{score.score ?? 0}</td>
+          <td>{score.date || '-'}</td>
         </tr>
       );
     }
