@@ -16,7 +16,7 @@ export function Scores() {
 
   // on startup grab scores from local storage
   React.useEffect(() => {
-    const scoresText = localStorage.getItem('scores');
+    const scoresText = localStorage.getItem('score');
     if (scoresText) {
       setScores(JSON.parse(scoresText));
     }
