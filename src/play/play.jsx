@@ -34,6 +34,16 @@ export function Play() {
     setPersonalBest(entry ? entry.score : 0);
   }, [isLoggedIn, userName]);
 
+  React.useEffect(() => {
+    if (!userName) return;
+    const users = loadUsers();
+    const exists = users.some((entry) => entry.name === userName);
+    if (!exists) {
+      localStorage.removeItem('userName');
+      setAuthMessage('User not found. Please log in again.');
+    }
+  }, [userName]);
+
   const checkForPersonalHighScore = (currentScore) => {
     if (!isLoggedIn) {
       setAuthMessage('Login to save high scores.');
@@ -45,10 +55,8 @@ export function Play() {
     const today = new Date().toLocaleDateString();
 
     if (entryIndex === -1) {
-      users.unshift({ name: userName, password: '', score: currentScore, date: today });
-      saveUsers(users);
-      setPersonalBest(currentScore);
-      setAuthMessage(`New personal high score: ${currentScore}!`);
+      localStorage.removeItem('userName');
+      setAuthMessage('User not found. Please log in again.');
       return;
     }
 

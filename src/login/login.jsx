@@ -5,7 +5,7 @@ import './login.css';
 export function Login() {
   const navigate = useNavigate();
   const [authMessage, setAuthMessage] = React.useState('');
-  const [isLoggedIn, setIsLoggedIn] = React.useState(Boolean(localStorage.getItem('userName')));
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
   const loadUsers = () => {
     const usersText = localStorage.getItem('users');
@@ -17,6 +17,22 @@ export function Login() {
       return [];
     }
   };
+
+  React.useEffect(() => {
+    const storedName = localStorage.getItem('userName');
+    if (!storedName) {
+      setIsLoggedIn(false);
+      return;
+    }
+    const users = loadUsers();
+    const exists = users.some((entry) => entry.name === storedName);
+    if (exists) {
+      setIsLoggedIn(true);
+    } else {
+      localStorage.removeItem('userName');
+      setIsLoggedIn(false);
+    }
+  }, []);
 
   const handleLogin = (event) => {
     event.preventDefault();
@@ -38,7 +54,6 @@ export function Login() {
       return;
     }
     localStorage.setItem('userName', username);
-    localStorage.setItem('authMode', 'login');
     setAuthMessage('');
     setIsLoggedIn(true);
     navigate('/play');

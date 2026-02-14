@@ -25,17 +25,7 @@ export function Scores() {
     if (usersText) {
       try {
         const parsed = JSON.parse(usersText);
-        if (Array.isArray(parsed)) {
-          setScores(parsed);
-        } else if (parsed && typeof parsed === 'object') {
-          const users = Object.entries(parsed).map(([name, password]) => ({
-            name,
-            password: password ?? '',
-            score: 0,
-            date: '',
-          }));
-          setScores(users);
-        }
+        setScores(Array.isArray(parsed) ? parsed : []);
       } catch (error) {
         setScores([]);
       }
