@@ -7,6 +7,11 @@ const funFacts = [
   'Bananas are berries, but strawberries are not.',
   'The Eiffel Tower can be 15 cm taller during the summer.',
   'Honey never spoils and can last indefinitely.',
+  'A day on Venus is longer than a year on Venus.',
+  'Sharks have been around longer than trees.',
+  'The human nose can remember 50,000 different scents.',
+  'Wombat poop is cube-shaped.',
+  'The shortest war in history lasted just 38 minutes.',
 ];
 
 export function Scores() {
@@ -55,8 +60,8 @@ export function Scores() {
     const sortedScores = [...scores].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
     for (const [i, score] of sortedScores.slice(0, 10).entries()) {
       scoreRows.push(
-        <tr key={i}>
-          <td>{i}</td>
+        <tr key={i + 1}>
+          <td>{i + 1}</td>
           <td>{score.name.split('@')[0]}</td>
           <td>{score.score ?? 0}</td>
           <td>{score.date || '-'}</td>
