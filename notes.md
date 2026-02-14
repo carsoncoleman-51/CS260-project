@@ -202,4 +202,16 @@ to push to server this is command: ```./deployReact.sh -k ~/.ssh/carson.aws.pem 
 ## React Part 2: Reactivity
 The main thing to understand is that React changes because of the "State" of everything. 
 
+example of setting state: ```const [score, setScore] = React.useState(0);```
 
+example of useEffect: ```  React.useEffect(() => {
+    const usersText = localStorage.getItem('users');
+    if (usersText) {
+      try {
+        const parsed = JSON.parse(usersText);
+        setScores(Array.isArray(parsed) ? parsed : []);
+      } catch (error) {
+        setScores([]);
+      }
+    }
+  }, []); ```

@@ -2,7 +2,7 @@ import React from 'react';
 import './play.css';
 
 export function Play() {
-  const userName = localStorage.getItem('userName') ?? '';
+  const [userName, setUserName] = React.useState(localStorage.getItem('userName') ?? '');
   const isLoggedIn = Boolean(userName);
 
   const [score, setScore] = React.useState(0);
@@ -40,6 +40,7 @@ export function Play() {
     const exists = users.some((entry) => entry.name === userName);
     if (!exists) {
       localStorage.removeItem('userName');
+      setUserName('');
       setAuthMessage('User not found. Please log in again.');
     }
   }, [userName]);
