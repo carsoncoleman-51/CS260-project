@@ -1,9 +1,18 @@
 import React from 'react';
 import './scores.css';
 
+const funFacts = [
+  'There are more trees on Earth than stars in the Milky Way.',
+  'Octopuses have three hearts.',
+  'Bananas are berries, but strawberries are not.',
+  'The Eiffel Tower can be 15 cm taller during the summer.',
+  'Honey never spoils and can last indefinitely.',
+];
+
 export function Scores() {
 
   const [scores, setScores] = React.useState([]);
+  const [funFact, setFunFact] = React.useState('');
 
   // on startup grab scores from local storage
   React.useEffect(() => {
@@ -11,6 +20,19 @@ export function Scores() {
     if (scoresText) {
       setScores(JSON.parse(scoresText));
     }
+  }, []);
+
+  React.useEffect(() => {
+    if (!funFacts.length) return;
+
+    const pickRandom = () => {
+      const next = funFacts[Math.floor(Math.random() * funFacts.length)];
+      setFunFact(next);
+    };
+
+    pickRandom();
+    const id = setInterval(pickRandom, 8000);
+    return () => clearInterval(id);
   }, []);
 
   const scoreRows = [];
@@ -49,20 +71,7 @@ export function Scores() {
         </tbody>
       </table>
 
-      <div className="scores-fun-fact">*Fun Fact From 3rd Party*</div>
+      <div className="scores-fun-fact">{funFact}</div>
     </main>
   );
 }
-
-export function randomFunFact() {
-  const [quote, setQuote] = React.useState('ig it didnt work');
-
-  React.useEffect(() => {
-    setQuote('Show me the code');
-  }, []);
-  return
-}
-
-const funFacts = [
-  
-];  

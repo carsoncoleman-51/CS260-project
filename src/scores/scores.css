@@ -26,6 +26,17 @@
 }
 
 .scores-fun-fact {
-  font-size: clamp(13px, 2.6vw, 18px);
-  font-weight: 700;
+  font-size: clamp(14px, 3vw, 20px);
+  font-weight: 600;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  line-height: 1.5;
+  text-align: center;
+  max-width: min(520px, 90vw);
+  padding: 10px 14px;
+  color: #111;
+  background: #f7f4ee;
+  border: 2px solid #111;
+  border-radius: 8px;
+  box-shadow: 2px 2px 0 #111;
 }
