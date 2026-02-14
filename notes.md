@@ -200,4 +200,6 @@ there are normal function calls and in-line function (lambda) calls. lambda also
 to push to server this is command: ```./deployReact.sh -k ~/.ssh/carson.aws.pem -h theredbuttongame.click -s startup```
 
 ## React Part 2: Reactivity
+The main thing to understand is that React changes because of the "State" of everything. 
+
 
