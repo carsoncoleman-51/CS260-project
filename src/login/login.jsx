@@ -19,17 +19,17 @@ export function Login() {
   };
 
   React.useEffect(() => {
-    const storedName = localStorage.getItem('userName');
-    if (!storedName) {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
       setIsLoggedIn(false);
       return;
     }
     const users = loadUsers();
-    const exists = users.some((entry) => entry.name === storedName);
+    const exists = users.some((entry) => entry.name === currentUser);
     if (exists) {
       setIsLoggedIn(true);
     } else {
-      localStorage.removeItem('userName');
+      localStorage.removeItem('currentUser');
       setIsLoggedIn(false);
     }
   }, []);
@@ -53,7 +53,7 @@ export function Login() {
       setAuthMessage('Incorrect password.');
       return;
     }
-    localStorage.setItem('userName', username);
+    localStorage.setItem('currentUser', username);
     setAuthMessage('');
     setIsLoggedIn(true);
     navigate('/play');
@@ -80,7 +80,7 @@ export function Login() {
       date: '',
     });
     localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('userName', username);
+    localStorage.setItem('currentUser', username);
 
     setAuthMessage('');
     setIsLoggedIn(true);
@@ -93,7 +93,7 @@ export function Login() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userName');
+    localStorage.removeItem('currentUser');
    
     setIsLoggedIn(false);
     setAuthMessage('Logged out.');

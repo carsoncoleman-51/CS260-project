@@ -2,8 +2,8 @@ import React from 'react';
 import './play.css';
 
 export function Play() {
-  const [userName, setUserName] = React.useState(localStorage.getItem('userName') ?? '');
-  const isLoggedIn = Boolean(userName);
+  const [currentUser, setCurrentUser] = React.useState(localStorage.getItem('currentUser') ?? '');
+  const isLoggedIn = Boolean(currentUser);
 
   const [score, setScore] = React.useState(0);
   const [authMessage, setAuthMessage] = React.useState('');
@@ -30,20 +30,20 @@ export function Play() {
       return;
     }
     const users = loadUsers();
-    const entry = users.find((user) => user.name === userName);
+    const entry = users.find((user) => user.name === currentUser);
     setPersonalBest(entry ? entry.score : 0);
-  }, [isLoggedIn, userName]);
+  }, [isLoggedIn, currentUser]);
 
   React.useEffect(() => {
-    if (!userName) return;
+    if (!currentUser) return;
     const users = loadUsers();
-    const exists = users.some((entry) => entry.name === userName);
+    const exists = users.some((entry) => entry.name === currentUser);
     if (!exists) {
-      localStorage.removeItem('userName');
-      setUserName('');
+      localStorage.removeItem('currentUser');
+      setCurrentUser('');
       setAuthMessage('User not found. Please log in again.');
     }
-  }, [userName]);
+  }, [currentUser]);
 
   const checkForPersonalHighScore = (currentScore) => {
     if (!isLoggedIn) {
@@ -52,11 +52,11 @@ export function Play() {
     }
 
     const users = loadUsers();
-    const entryIndex = users.findIndex((entry) => entry.name === userName);
+    const entryIndex = users.findIndex((entry) => entry.name === currentUser);
     const today = new Date().toLocaleDateString();
 
     if (entryIndex === -1) {
-      localStorage.removeItem('userName');
+      localStorage.removeItem('currentUser');
       setAuthMessage('User not found. Please log in again.');
       return;
     }
@@ -84,7 +84,7 @@ export function Play() {
   return (
     <main className="play-view container-fluid text-center">
       <PlayerPanel
-        userName={userName}
+        currentUser={currentUser}
         isLoggedIn={isLoggedIn}
         score={score}
         personalBest={personalBest}
@@ -96,12 +96,12 @@ export function Play() {
   );
 }
 
-function PlayerPanel({ userName, isLoggedIn, score, personalBest, authMessage, onButtonPush }) {
+function PlayerPanel({ currentUser, isLoggedIn, score, personalBest, authMessage, onButtonPush }) {
   return (
     <>
       <div className="player-meta">
         <div>
-          Player: <span className="player-name">{isLoggedIn ? userName : 'Guest'}</span>
+          Player: <span className="player-name">{isLoggedIn ? currentUser : 'Guest'}</span>
         </div>
         <div className="personal-high-score">
           Personal High Score: <span className="score-value">{personalBest}</span>
@@ -130,9 +130,9 @@ function HighScoreNotifications() {
     const id = setInterval(() => {
       const score = Math.floor(Math.random() * 30);
       const date = new Date().toLocaleDateString();
-      const userName = sampleNames[nameIndexRef.current % sampleNames.length];
+      const currentUser = sampleNames[nameIndexRef.current % sampleNames.length];
       nameIndexRef.current += 1;
-      setEvents((prev) => [{ name: userName, score, date }, ...prev].slice(0, 2));
+      setEvents((prev) => [{ name: currentUser, score, date }, ...prev].slice(0, 2));
     }, 5000);
 
     return () => clearInterval(id);
