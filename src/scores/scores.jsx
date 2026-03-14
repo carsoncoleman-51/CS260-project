@@ -1,23 +1,12 @@
 import React from 'react';
 import './scores.css';
 
-const funFacts = [
-  'There are more trees on Earth than stars in the Milky Way.',
-  'Octopuses have three hearts.',
-  'Bananas are berries, but strawberries are not.',
-  'The Eiffel Tower can be 15 cm taller during the summer.',
-  'Honey never spoils and can last indefinitely.',
-  'A day on Venus is longer than a year on Venus.',
-  'Sharks have been around longer than trees.',
-  'The human nose can remember 50,000 different scents.',
-  'Wombat poop is cube-shaped.',
-  'The shortest war in history lasted just 38 minutes.',
-];
+
 
 export function Scores() {
 
   const [scores, setScores] = React.useState([]);
-  const [funFact, setFunFact] = React.useState('');
+  const [funFact, setFunFact] = React.useState('Loading fun fact...');
 
   // on startup grab scores from local storage
   React.useEffect(() => {
@@ -33,17 +22,23 @@ export function Scores() {
   }, []);
 
   React.useEffect(() => {
-    if (!funFacts.length) return;
+    async function getFunFact() {
+      try {
+        const response = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=en');
+        if (!response.ok) {
+          throw new Error('Failed to fetch random fact');
+        }
 
-    const pickRandom = () => {
-      const next = funFacts[Math.floor(Math.random() * funFacts.length)];
-      setFunFact(next);
-    };
+        const data = await response.json();
+        setFunFact(data.text || 'No fact available right now.');
+      } catch (error) {
+        setFunFact('Could not load a fun fact right now.');
+      }
+    }
 
-    pickRandom();
-    const id = setInterval(pickRandom, 8000);
-    return () => clearInterval(id);
+    getFunFact();
   }, []);
+
 
   const scoreRows = [];
   if (scores.length) {

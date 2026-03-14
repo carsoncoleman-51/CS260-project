@@ -215,3 +215,5 @@ example of useEffect: ```  React.useEffect(() => {
       }
     }
   }, []); ```
+
+  to connect to mongoDB mongodb+srv://carson:<db_password>@cluster-initial.aldreu1.mongodb.net/?appName=Cluster-initial
