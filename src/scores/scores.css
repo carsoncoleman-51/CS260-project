@@ -40,3 +40,7 @@
   border-radius: 8px;
   box-shadow: 2px 2px 0 #111;
 }
+
+.scores-fun-fact:hover {
+  cursor: pointer;
+}

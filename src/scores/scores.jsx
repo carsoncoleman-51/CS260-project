@@ -8,6 +8,21 @@ export function Scores() {
   const [scores, setScores] = React.useState([]);
   const [funFact, setFunFact] = React.useState('Loading fun fact...');
 
+  const getFunFact = React.useCallback(async () => {
+    setFunFact('Loading fun fact...');
+    try {
+      const response = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=en');
+      if (!response.ok) {
+        throw new Error('Failed to fetch random fact');
+      }
+
+      const data = await response.json();
+      setFunFact(data.text || 'No fact available right now.');
+    } catch (error) {
+      setFunFact('Could not load a fun fact right now.');
+    }
+  }, []);
+
   // on startup grab scores from local storage
   React.useEffect(() => {
     const usersText = localStorage.getItem('users');
@@ -22,22 +37,8 @@ export function Scores() {
   }, []);
 
   React.useEffect(() => {
-    async function getFunFact() {
-      try {
-        const response = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=en');
-        if (!response.ok) {
-          throw new Error('Failed to fetch random fact');
-        }
-
-        const data = await response.json();
-        setFunFact(data.text || 'No fact available right now.');
-      } catch (error) {
-        setFunFact('Could not load a fun fact right now.');
-      }
-    }
-
     getFunFact();
-  }, []);
+  }, [getFunFact]);
 
 
   const scoreRows = [];
@@ -77,7 +78,9 @@ export function Scores() {
         </tbody>
       </table>
 
-      <div className="scores-fun-fact">{funFact}</div>
+      <div className="scores-fun-fact" onClick={getFunFact}>
+        {funFact}
+      </div>
     </main>
   );
 }
