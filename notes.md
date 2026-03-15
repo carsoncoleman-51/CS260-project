@@ -217,3 +217,15 @@ example of useEffect: ```  React.useEffect(() => {
   }, []); ```
 
   to connect to mongoDB mongodb+srv://carson:<db_password>@cluster-initial.aldreu1.mongodb.net/?appName=Cluster-initial
+
+## Connect to Backend
+client talks to server with `fetch('/api/...')` using HTTP requests.
+each request sends method + route + headers, and sometimes a JSON body.
+`express.json()` on the server parses JSON into `req.body` for route handlers.
+`POST /api/auth` creates an account, hashes password with bcrypt, then sets auth cookie.
+`PUT /api/auth` logs in by comparing password hash and refreshing auth cookie token.
+auth cookie is `httpOnly` + `sameSite: 'strict'`, so JS cannot read token directly.
+browser automatically sends cookie on same-origin calls like `/api/user/me` and `/api/scores`.
+`requireAuth` checks `req.cookies.token`; if missing/invalid server returns `401 Unauthorized`.
+`GET /api/scores` returns leaderboard JSON, `POST /api/scores` updates personal best.
+frontend reads response JSON, updates React state, and UI rerenders (play page polls every 5s).
