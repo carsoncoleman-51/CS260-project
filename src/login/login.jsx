@@ -2,37 +2,68 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
 
+async function readJson(response) {
+  try {
+    return await response.json();
+  } catch (error) {
+    return {};
+  }
+}
+
 export function Login() {
   const navigate = useNavigate();
   const [authMessage, setAuthMessage] = React.useState('');
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [currentUsername, setCurrentUsername] = React.useState('');
 
-  const loadUsers = () => {
-    const usersText = localStorage.getItem('users');
-    if (!usersText) return [];
+  const refreshSession = React.useCallback(async () => {
     try {
-      const parsed = JSON.parse(usersText);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      return [];
-    }
-  };
+      const response = await fetch('/api/user/me');
+      const data = await readJson(response);
+      if (!response.ok) {
+        setIsLoggedIn(false);
+        setCurrentUsername('');
+        return;
+      }
 
-  React.useEffect(() => {
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      setIsLoggedIn(false);
-      return;
-    }
-    const users = loadUsers();
-    const exists = users.some((entry) => entry.name === currentUser);
-    if (exists) {
+      setAuthMessage('');
       setIsLoggedIn(true);
-    } else {
-      localStorage.removeItem('currentUser');
+      setCurrentUsername(data.username ?? '');
+    } catch (error) {
       setIsLoggedIn(false);
+      setCurrentUsername('');
+      setAuthMessage('Could not reach server.');
     }
   }, []);
+
+  React.useEffect(() => {
+    refreshSession();
+  }, [refreshSession]);
+
+  const authenticate = async (method, username, password) => {
+    try {
+      const response = await fetch('/api/auth', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await readJson(response);
+
+      if (!response.ok) {
+        setAuthMessage(data.msg || 'Authentication failed.');
+        setIsLoggedIn(false);
+        setCurrentUsername('');
+        return;
+      }
+
+      setAuthMessage('');
+      setIsLoggedIn(true);
+      setCurrentUsername(data.username ?? username);
+      navigate('/play');
+    } catch (error) {
+      setAuthMessage('Could not reach server.');
+    }
+  };
 
   const handleLogin = (event) => {
     event.preventDefault();
@@ -43,20 +74,7 @@ export function Login() {
       setAuthMessage('Enter a username and password.');
       return;
     }
-    const users = loadUsers();
-    const user = users.find((entry) => entry.name === username);
-    if (!user) {
-      setAuthMessage('Username not found, please create an account.');
-      return;
-    }
-    if (user.password !== password) {
-      setAuthMessage('Incorrect password.');
-      return;
-    }
-    localStorage.setItem('currentUser', username);
-    setAuthMessage('');
-    setIsLoggedIn(true);
-    navigate('/play');
+    authenticate('PUT', username, password);
   };
 
   const handleCreateAccount = (event) => {
@@ -68,23 +86,7 @@ export function Login() {
       setAuthMessage('Choose a username and password.');
       return;
     }
-    const users = loadUsers();
-    if (users.some((entry) => entry.name === username)) {
-      setAuthMessage('Username already exists, please press login button instead.');
-      return;
-    }
-    users.push({
-      name: username,
-      password,
-      score: 0,
-      date: '',
-    });
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('currentUser', username);
-
-    setAuthMessage('');
-    setIsLoggedIn(true);
-    navigate('/play');
+    authenticate('POST', username, password);
   };
 
   const handleEnterSubmit = (event) => {
@@ -92,10 +94,15 @@ export function Login() {
     setAuthMessage('If you just pressed enter I am sorry but you need to click the button yourself sorry');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-   
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth', { method: 'DELETE' });
+    } catch (error) {
+      // Ignore network errors on logout and clear local UI state.
+    }
+
     setIsLoggedIn(false);
+    setCurrentUsername('');
     setAuthMessage('Logged out.');
   };
 
@@ -105,6 +112,7 @@ export function Login() {
       <form className="login-form" onSubmit={handleEnterSubmit}>
         {isLoggedIn ? (
           <div className="d-grid gap-2">
+            <div className="login-message">Logged in as {currentUsername || 'player'}.</div>
             <button type="button" className="btn btn-secondary login-button" onClick={handleLogout}>
               LOGOUT
             </button>

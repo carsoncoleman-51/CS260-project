@@ -1,82 +1,126 @@
 import React from 'react';
 import './play.css';
 
+async function readJson(response) {
+  try {
+    return await response.json();
+  } catch (error) {
+    return {};
+  }
+}
+
 export function Play() {
-  const [currentUser, setCurrentUser] = React.useState(localStorage.getItem('currentUser') ?? '');
+  const [currentUser, setCurrentUser] = React.useState('');
   const isLoggedIn = Boolean(currentUser);
 
   const [score, setScore] = React.useState(0);
   const [authMessage, setAuthMessage] = React.useState('');
   const [personalBest, setPersonalBest] = React.useState(0);
+  const [events, setEvents] = React.useState([]);
 
-  const loadUsers = () => {
-    const usersText = localStorage.getItem('users');
-    if (!usersText) return [];
+  const loadCurrentUser = React.useCallback(async () => {
     try {
-      const parsed = JSON.parse(usersText);
-      return Array.isArray(parsed) ? parsed : [];
+      const response = await fetch('/api/user/me');
+      const data = await readJson(response);
+      if (!response.ok) {
+        setCurrentUser('');
+        setPersonalBest(0);
+        return;
+      }
+
+      setAuthMessage('');
+      setCurrentUser(data.username ?? '');
     } catch (error) {
-      return [];
-    }
-  };
-
-  const saveUsers = (users) => {
-    localStorage.setItem('users', JSON.stringify(users));
-  };
-
-  React.useEffect(() => {
-    if (!isLoggedIn) {
-      setPersonalBest(0);
-      return;
-    }
-    const users = loadUsers();
-    const entry = users.find((user) => user.name === currentUser);
-    setPersonalBest(entry ? entry.score : 0);
-  }, [isLoggedIn, currentUser]);
-
-  React.useEffect(() => {
-    if (!currentUser) return;
-    const users = loadUsers();
-    const exists = users.some((entry) => entry.name === currentUser);
-    if (!exists) {
-      localStorage.removeItem('currentUser');
       setCurrentUser('');
-      setAuthMessage('User not found. Please log in again.');
+      setPersonalBest(0);
+      setAuthMessage('Could not reach server.');
+    }
+  }, []);
+
+  const loadLeaderboard = React.useCallback(async () => {
+    try {
+      const response = await fetch('/api/scores');
+      const data = await readJson(response);
+      if (!response.ok) {
+        setEvents([]);
+        return;
+      }
+
+      const leaderboard = Array.isArray(data.scores) ? data.scores : [];
+      setEvents(leaderboard.slice(0, 2));
+
+      if (!currentUser) {
+        setPersonalBest(0);
+        return;
+      }
+
+      const currentUserEntry = leaderboard.find((entry) => entry.username === currentUser);
+      setPersonalBest(currentUserEntry?.score ?? 0);
+    } catch (error) {
+      setEvents([]);
     }
   }, [currentUser]);
 
-  const checkForPersonalHighScore = (currentScore) => {
+  React.useEffect(() => {
+    loadCurrentUser();
+  }, [loadCurrentUser]);
+
+  React.useEffect(() => {
+    loadLeaderboard();
+  }, [loadLeaderboard]);
+
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      loadLeaderboard();
+    }, 5000);
+
+    return () => clearInterval(id);
+  }, [loadLeaderboard]);
+
+  const checkForPersonalHighScore = async (currentScore) => {
     if (!isLoggedIn) {
       setAuthMessage('Login to save high scores.');
       return;
     }
 
-    const users = loadUsers();
-    const entryIndex = users.findIndex((entry) => entry.name === currentUser);
-    const today = new Date().toLocaleDateString();
+    try {
+      const response = await fetch('/api/scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score: currentScore }),
+      });
+      const data = await readJson(response);
 
-    if (entryIndex === -1) {
-      localStorage.removeItem('currentUser');
-      setAuthMessage('User not found. Please log in again.');
-      return;
-    }
+      if (response.status === 401) {
+        setCurrentUser('');
+        setPersonalBest(0);
+        setAuthMessage('Session expired. Please log in again.');
+        return;
+      }
 
-    const entry = users[entryIndex];
-    if (currentScore > entry.score) {
-      users[entryIndex] = { ...entry, score: currentScore, date: today };
-      saveUsers(users);
-      setPersonalBest(currentScore);
-      setAuthMessage(`New personal high score: ${currentScore}!`);
-    } else {
-      setAuthMessage('No new personal high score.');
+      if (!response.ok) {
+        setAuthMessage(data.msg || 'Could not save score.');
+        return;
+      }
+
+      setPersonalBest((prevBest) => data.personalBest ?? prevBest);
+      if (data.isNewPersonalBest) {
+        setAuthMessage(`New personal high score: ${data.personalBest}!`);
+      } else {
+        setAuthMessage('No new personal high score.');
+      }
+
+      loadLeaderboard();
+    } catch (error) {
+      setAuthMessage('Could not reach server to save score.');
     }
   };
 
-  const buttonPush = () => {
+  const buttonPush = async () => {
     if (Math.random() < 0.5) {
       setScore((prevScore) => prevScore + 1);
     } else {
-      checkForPersonalHighScore(score);
+      await checkForPersonalHighScore(score);
       setScore(0);
     }
   };
@@ -91,7 +135,7 @@ export function Play() {
         authMessage={authMessage}
         onButtonPush={buttonPush}
       />
-      <HighScoreNotifications />
+      <HighScoreNotifications events={events} />
     </main>
   );
 }
@@ -121,29 +165,13 @@ function PlayerPanel({ currentUser, isLoggedIn, score, personalBest, authMessage
   );
 }
 
-function HighScoreNotifications() {
-  const [events, setEvents] = React.useState([]);
-  const nameIndexRef = React.useRef(0);
-  const sampleNames = ['Eich', 'Ada', 'Linus', 'Grace', 'Alan'];
-
-  React.useEffect(() => {
-    const id = setInterval(() => {
-      const score = Math.floor(Math.random() * 30);
-      const date = new Date().toLocaleDateString();
-      const currentUser = sampleNames[nameIndexRef.current % sampleNames.length];
-      nameIndexRef.current += 1;
-      setEvents((prev) => [{ name: currentUser, score, date }, ...prev].slice(0, 2));
-    }, 5000);
-
-    return () => clearInterval(id);
-  }, []);
-
+function HighScoreNotifications({ events }) {
   return (
     <div className="notifications">
       {events.length ? (
         events.map((event, index) => (
-          <div key={`${event.name}-${event.date}-${index}`}>
-            {event.name} got a new high score! {event.score}
+          <div key={`${event.username}-${event.date}-${index}`}>
+            {event.username} high score: {event.score}
           </div>
         ))
       ) : (

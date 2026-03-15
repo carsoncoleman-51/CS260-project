@@ -1,11 +1,17 @@
-import React from 'react';
+﻿import React from 'react';
 import './scores.css';
 
-
+async function readJson(response) {
+  try {
+    return await response.json();
+  } catch (error) {
+    return {};
+  }
+}
 
 export function Scores() {
-
   const [scores, setScores] = React.useState([]);
+  const [scoresMessage, setScoresMessage] = React.useState('');
   const [funFact, setFunFact] = React.useState('Loading fun fact...');
 
   const getFunFact = React.useCallback(async () => {
@@ -23,23 +29,32 @@ export function Scores() {
     }
   }, []);
 
-  // on startup grab scores from local storage
-  React.useEffect(() => {
-    const usersText = localStorage.getItem('users');
-    if (usersText) {
-      try {
-        const parsed = JSON.parse(usersText);
-        setScores(Array.isArray(parsed) ? parsed : []);
-      } catch (error) {
+  const loadScores = React.useCallback(async () => {
+    try {
+      const response = await fetch('/api/scores');
+      const data = await readJson(response);
+      if (!response.ok) {
         setScores([]);
+        setScoresMessage(data.msg || 'Could not load scores right now.');
+        return;
       }
+
+      const leaderboard = Array.isArray(data.scores) ? data.scores : [];
+      setScores(leaderboard);
+      setScoresMessage('');
+    } catch (error) {
+      setScores([]);
+      setScoresMessage('Could not reach server to load scores.');
     }
   }, []);
 
   React.useEffect(() => {
+    loadScores();
+  }, [loadScores]);
+
+  React.useEffect(() => {
     getFunFact();
   }, [getFunFact]);
-
 
   const scoreRows = [];
   if (scores.length) {
@@ -48,7 +63,7 @@ export function Scores() {
       scoreRows.push(
         <tr key={i + 1}>
           <td>{i + 1}</td>
-          <td>{score.name.split('@')[0]}</td>
+          <td>{score.username || '-'}</td>
           <td>{score.score ?? 0}</td>
           <td>{score.date || '-'}</td>
         </tr>
@@ -57,7 +72,7 @@ export function Scores() {
   } else {
     scoreRows.push(
       <tr key='0'>
-        <td colSpan='4'>Be the first to score</td>
+        <td colSpan='4'>{scoresMessage || 'Be the first to score'}</td>
       </tr>
     );
   }
@@ -65,7 +80,7 @@ export function Scores() {
   return (
     <main className="scores-view">
       <table className="scores-display-table">
-      <thead className='scores-display-table-header'>
+        <thead className='scores-display-table-header'>
           <tr>
             <th>#</th>
             <th>Name</th>
