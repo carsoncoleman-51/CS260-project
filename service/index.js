@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
@@ -9,7 +10,10 @@ const port = process.argv.length > 2 ? Number(process.argv[2]) : 4000;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static('public'));
+const frontendPath = resolveFrontendPath();
+if (frontendPath) {
+  app.use(express.static(frontendPath));
+}
 
 const users = [];
 
@@ -102,7 +106,13 @@ app.use((req, res, next) => {
     next();
     return;
   }
-  res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+
+  if (!frontendPath) {
+    res.status(404).send({ msg: 'Frontend build not found' });
+    return;
+  }
+
+  res.sendFile(path.resolve(frontendPath, 'index.html'));
 });
 
 function requireAuth(req, res, next) {
@@ -125,6 +135,22 @@ function normalizeAuthRequest(body) {
   }
 
   return { username, password, error: '' };
+}
+
+function resolveFrontendPath() {
+  const candidatePaths = [
+    path.resolve(__dirname, 'public'),
+    path.resolve(__dirname, '..', 'dist'),
+    path.resolve(__dirname, '..', 'public'),
+  ];
+
+  for (const candidatePath of candidatePaths) {
+    if (fs.existsSync(path.resolve(candidatePath, 'index.html'))) {
+      return candidatePath;
+    }
+  }
+
+  return '';
 }
 
 function getUserByUsername(username) {
