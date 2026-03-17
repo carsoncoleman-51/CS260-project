@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
+const DB = require('./database');
 
 const app = express();
 const port = process.argv.length > 2 ? Number(process.argv[2]) : 4000;
@@ -15,8 +16,6 @@ if (frontendPath) {
   app.use(express.static(frontendPath));
 }
 
-const users = [];
-
 app.post('/api/auth', async (req, res) => {
   const { username, password, error } = normalizeAuthRequest(req.body);
   if (error) {
@@ -24,21 +23,13 @@ app.post('/api/auth', async (req, res) => {
     return;
   }
 
-  if (getUserByUsername(username)) {
+  if (await DB.getUser(username)) {
     res.status(409).send({ msg: 'Existing user' });
     return;
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = {
-    username,
-    password: passwordHash,
-    token: '',
-    score: 0,
-    date: '',
-  };
-  users.push(user);
-  setAuthCookie(res, user);
+  const user = await createUser(username, password);
+  setAuthCookie(res, user.token);
   res.send({ username: user.username });
 });
 
@@ -49,24 +40,27 @@ app.put('/api/auth', async (req, res) => {
     return;
   }
 
-  const user = getUserByUsername(username);
+  const user = await DB.getUser(username);
   if (!user || !(await bcrypt.compare(password, user.password))) {
     res.status(401).send({ msg: 'Unauthorized' });
     return;
   }
 
-  setAuthCookie(res, user);
+  user.token = uuidv4();
+  await DB.updateUser(user);
+  setAuthCookie(res, user.token);
   res.send({ username: user.username });
 });
 
-app.delete('/api/auth', (req, res) => {
+app.delete('/api/auth', async (req, res) => {
   const token = req.cookies.token;
-  const user = getUserByToken(token);
+  const user = await DB.getUserByToken(token);
   if (user) {
-    clearAuthCookie(res, user);
-  } else {
-    res.clearCookie('token', cookieOptions());
+    user.token = '';
+    await DB.updateUser(user);
   }
+
+  res.clearCookie('token', cookieOptions());
   res.send({});
 });
 
@@ -74,11 +68,12 @@ app.get('/api/user/me', requireAuth, (req, res) => {
   res.send({ username: req.user.username });
 });
 
-app.get('/api/scores', (_req, res) => {
-  res.send({ scores: getLeaderboard() });
+app.get('/api/scores', async (_req, res) => {
+  const scores = await DB.getLeaderboard(10);
+  res.send({ scores });
 });
 
-app.post('/api/scores', requireAuth, (req, res) => {
+app.post('/api/scores', requireAuth, async (req, res) => {
   const rawScore = req.body?.score;
   if (typeof rawScore !== 'number' || !Number.isFinite(rawScore) || rawScore < 0) {
     res.status(400).send({ msg: 'Invalid score' });
@@ -88,16 +83,17 @@ app.post('/api/scores', requireAuth, (req, res) => {
   const submittedScore = Math.floor(rawScore);
   let isNewPersonalBest = false;
 
-  if (submittedScore > req.user.score) {
+  if (submittedScore > (req.user.score ?? 0)) {
     req.user.score = submittedScore;
     req.user.date = todayDate();
+    await DB.updateUser(req.user);
     isNewPersonalBest = true;
   }
 
   res.send({
-    personalBest: req.user.score,
+    personalBest: req.user.score ?? 0,
     isNewPersonalBest,
-    date: req.user.date,
+    date: req.user.date || '',
   });
 });
 
@@ -115,15 +111,24 @@ app.use((req, res, next) => {
   res.sendFile(path.resolve(frontendPath, 'index.html'));
 });
 
-function requireAuth(req, res, next) {
-  const token = req.cookies.token;
-  const user = getUserByToken(token);
-  if (!user) {
-    res.status(401).send({ msg: 'Unauthorized' });
-    return;
+app.use((err, _req, res, _next) => {
+  res.status(500).send({ type: err.name, message: err.message });
+});
+
+async function requireAuth(req, res, next) {
+  try {
+    const token = req.cookies.token;
+    const user = await DB.getUserByToken(token);
+    if (!user) {
+      res.status(401).send({ msg: 'Unauthorized' });
+      return;
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    next(error);
   }
-  req.user = user;
-  next();
 }
 
 function normalizeAuthRequest(body) {
@@ -153,45 +158,27 @@ function resolveFrontendPath() {
   return '';
 }
 
-function getUserByUsername(username) {
-  return users.find((user) => user.username === username);
-}
+async function createUser(username, password) {
+  const passwordHash = await bcrypt.hash(password, 10);
 
-function getUserByToken(token) {
-  if (!token) {
-    return undefined;
-  }
-  return users.find((user) => user.token === token);
-}
+  const user = {
+    username,
+    password: passwordHash,
+    token: uuidv4(),
+    score: 0,
+    date: '',
+  };
 
-function getLeaderboard() {
-  return [...users]
-    .sort((a, b) => {
-      const scoreDiff = (b.score ?? 0) - (a.score ?? 0);
-      if (scoreDiff !== 0) {
-        return scoreDiff;
-      }
-      return (b.date || '').localeCompare(a.date || '');
-    })
-    .map((user) => ({
-      username: user.username,
-      score: user.score ?? 0,
-      date: user.date || '',
-    }));
+  await DB.addUser(user);
+  return user;
 }
 
 function todayDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function setAuthCookie(res, user) {
-  user.token = uuidv4();
-  res.cookie('token', user.token, cookieOptions());
-}
-
-function clearAuthCookie(res, user) {
-  user.token = '';
-  res.clearCookie('token', cookieOptions());
+function setAuthCookie(res, token) {
+  res.cookie('token', token, cookieOptions());
 }
 
 function cookieOptions() {
