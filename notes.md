@@ -229,3 +229,6 @@ browser automatically sends cookie on same-origin calls like `/api/user/me` and 
 `requireAuth` checks `req.cookies.token`; if missing/invalid server returns `401 Unauthorized`.
 `GET /api/scores` returns leaderboard JSON, `POST /api/scores` updates personal best.
 frontend reads response JSON, updates React state, and UI rerenders (play page polls every 5s).
+
+## data storage
+The server has the DB credentials in the dbConfig.json file, which is under gitignore thats important. The server will interact with mongoDB's servers which i think is called Atlas. Atlas will check that the credentials are right and give/take the correct data needed. MongoDB is set with only one user that can access the cluster which is me.
