@@ -232,3 +232,6 @@ frontend reads response JSON, updates React state, and UI rerenders (play page p
 
 ## data storage
 The server has the DB credentials in the dbConfig.json file, which is under gitignore thats important. The server will interact with mongoDB's servers which i think is called Atlas. Atlas will check that the credentials are right and give/take the correct data needed. MongoDB is set with only one user that can access the cluster which is me.
+
+## web socket
+To add WebSocket support, install ws on the backend, then create the client socket on page load with const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss' and new WebSocket(...), store it in a ref, and send game-over events with socket.send(JSON.stringify({ type: 'playerLost', score, isHighScore })); on the server, run Express through http.createServer(app), attach new WebSocketServer({ server }), parse and validate each incoming JSON message, and broadcast valid events to all connected clients so everyone sees updates in real time; finally, handle socket.onmessage on the frontend to update notifications/leaderboard instantly, and close the socket on unmount to avoid leaks (use localhost:4000 in local dev and wss:// in production over HTTPS).
