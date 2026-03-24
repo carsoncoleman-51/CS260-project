@@ -17,7 +17,7 @@ export function Play() {
   const [authMessage, setAuthMessage] = React.useState('');
   const [personalBest, setPersonalBest] = React.useState(0);
   const [events, setEvents] = React.useState([]);
-  const socketRef = React.useRef(null);
+  const socketRef = React.useRef(null); //so this is more beneficial cuz provides a way to store mutable values that persist across component re-renders without triggering a re-render when the value changes
 
   const loadCurrentUser = React.useCallback(async () => {
     try {
@@ -75,8 +75,9 @@ export function Play() {
     return () => clearInterval(id);
   }, [loadLeaderboard]);
 
+  //starts up when componet first loads
   React.useEffect(() => {
-    const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
+    const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss'; //taken from class code, decides which type of connection
     const socketHost =
       window.location.hostname === 'localhost' ? 'localhost:4000' : window.location.host;
     const socket = new WebSocket(`${protocol}://${socketHost}`);
@@ -85,7 +86,7 @@ export function Play() {
     socket.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        if (message?.type !== 'playerLost') {
+        if (message?.type !== 'playerLost') { //only does for playerlost events
           return;
         }
 
@@ -103,7 +104,7 @@ export function Play() {
         // Ignore invalid websocket payloads.
       }
     };
-
+//close socket
     return () => {
       socketRef.current = null;
       socket.close();
@@ -113,9 +114,9 @@ export function Play() {
   const sendLossEvent = React.useCallback((eventData) => {
     const socket = socketRef.current;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
-      return;
+      return; //stops if cant send
     }
-
+//sends out ws to server with player lost event, includes username, score, and if its a high score or not
     socket.send(
       JSON.stringify({
         type: 'playerLost',
@@ -160,7 +161,7 @@ export function Play() {
         setAuthMessage(`New personal high score: ${data.personalBest}!`);
       } else {
         setAuthMessage('No new personal high score.');
-      }
+      } //send ws event about player losing, includes if they got a new personal best or not
       sendLossEvent({
         username: currentUser,
         score: currentScore,
@@ -223,13 +224,14 @@ function PlayerPanel({ currentUser, isLoggedIn, score, personalBest, authMessage
   );
 }
 
+//displays recent high score notifications, shows username, score, and if its a new personal best or not
 function HighScoreNotifications({ events }) {
   return (
     <div className="notifications">
       {events.length ? (
         events.map((event, index) => (
           <div key={`${event.username}-${event.date}-${index}`}>
-            {event.username} lost at {event.score}
+            {event.username} lost at {event.score} 
             {event.isHighScore ? ' (new personal high score)' : ''}
           </div>
         ))
