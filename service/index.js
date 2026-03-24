@@ -10,8 +10,8 @@ const DB = require('./database');
 
 const app = express();
 const port = process.argv.length > 2 ? Number(process.argv[2]) : 4000;
-const server = http.createServer(app);
-const sockets = new Set();
+const server = http.createServer(app); //used for both HTTP and WebSocket
+const sockets = new Set(); 
 
 app.use(express.json());
 app.use(cookieParser());
@@ -20,10 +20,10 @@ if (frontendPath) {
   app.use(express.static(frontendPath));
 }
 
-const wsServer = new WebSocketServer({ server });
-wsServer.on('connection', (socket) => {
-  sockets.add(socket);
-
+const wsServer = new WebSocketServer({ server }); // Attach WebSocket server to the same HTTP server
+wsServer.on('connection', (socket) => { //Used for new connection
+  sockets.add(socket); //add teh socket
+  //this part uses try catch block for incoming websocket messages from server
   socket.on('message', (rawMessage) => {
     let message;
     try {
@@ -31,7 +31,7 @@ wsServer.on('connection', (socket) => {
     } catch (_error) {
       return;
     }
-
+    //only takes message with type playerlost, helps organzie
     if (message?.type !== 'playerLost') {
       return;
     }
@@ -42,17 +42,21 @@ wsServer.on('connection', (socket) => {
     }
 
     broadcast({
+      // the event name that clients listen for
       type: 'playerLost',
       username:
         typeof message.username === 'string' && message.username.trim()
           ? message.username.trim()
           : 'Guest',
+          //make score into int
       score: Math.floor(score),
+      // Normalize truthy/falsy values to a boolean.
       isHighScore: Boolean(message.isHighScore),
+      // Attach today's date so clients can display when it happened cuz why not.
       date: todayDate(),
     });
   });
-
+  //close the socket 
   socket.on('close', () => {
     sockets.delete(socket);
   });
