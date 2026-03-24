@@ -2,12 +2,16 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+const http = require('http');
+const { WebSocketServer, WebSocket } = require('ws');
 const fs = require('fs');
 const path = require('path');
 const DB = require('./database');
 
 const app = express();
 const port = process.argv.length > 2 ? Number(process.argv[2]) : 4000;
+const server = http.createServer(app);
+const sockets = new Set();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -15,6 +19,48 @@ const frontendPath = resolveFrontendPath();
 if (frontendPath) {
   app.use(express.static(frontendPath));
 }
+
+const wsServer = new WebSocketServer({ server });
+wsServer.on('connection', (socket) => {
+  sockets.add(socket);
+
+  socket.on('message', (rawMessage) => {
+    let message;
+    try {
+      message = JSON.parse(rawMessage.toString());
+    } catch (_error) {
+      return;
+    }
+
+    if (message?.type !== 'playerLost') {
+      return;
+    }
+
+    const score = Number(message.score);
+    if (!Number.isFinite(score) || score < 0) {
+      return;
+    }
+
+    broadcast({
+      type: 'playerLost',
+      username:
+        typeof message.username === 'string' && message.username.trim()
+          ? message.username.trim()
+          : 'Guest',
+      score: Math.floor(score),
+      isHighScore: Boolean(message.isHighScore),
+      date: todayDate(),
+    });
+  });
+
+  socket.on('close', () => {
+    sockets.delete(socket);
+  });
+
+  socket.on('error', () => {
+    sockets.delete(socket);
+  });
+});
 
 app.post('/api/auth', async (req, res) => {
   const { username, password, error } = normalizeAuthRequest(req.body);
@@ -189,6 +235,15 @@ function cookieOptions() {
   };
 }
 
-app.listen(port, () => {
+function broadcast(event) {
+  const payload = JSON.stringify(event);
+  for (const socket of sockets) {
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(payload);
+    }
+  }
+}
+
+server.listen(port, () => {
   console.log(`Backend service listening on port ${port}`);
 });

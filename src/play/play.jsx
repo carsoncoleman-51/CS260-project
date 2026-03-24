@@ -17,6 +17,7 @@ export function Play() {
   const [authMessage, setAuthMessage] = React.useState('');
   const [personalBest, setPersonalBest] = React.useState(0);
   const [events, setEvents] = React.useState([]);
+  const socketRef = React.useRef(null);
 
   const loadCurrentUser = React.useCallback(async () => {
     try {
@@ -42,13 +43,10 @@ export function Play() {
       const response = await fetch('/api/scores');
       const data = await readJson(response);
       if (!response.ok) {
-        setEvents([]);
         return;
       }
 
       const leaderboard = Array.isArray(data.scores) ? data.scores : [];
-      setEvents(leaderboard.slice(0, 2));
-
       if (!currentUser) {
         setPersonalBest(0);
         return;
@@ -57,7 +55,7 @@ export function Play() {
       const currentUserEntry = leaderboard.find((entry) => entry.username === currentUser);
       setPersonalBest(currentUserEntry?.score ?? 0);
     } catch (error) {
-      setEvents([]);
+      // Keep the last known value if leaderboard fetch fails.
     }
   }, [currentUser]);
 
@@ -77,9 +75,61 @@ export function Play() {
     return () => clearInterval(id);
   }, [loadLeaderboard]);
 
+  React.useEffect(() => {
+    const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
+    const socketHost =
+      window.location.hostname === 'localhost' ? 'localhost:4000' : window.location.host;
+    const socket = new WebSocket(`${protocol}://${socketHost}`);
+    socketRef.current = socket;
+
+    socket.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message?.type !== 'playerLost') {
+          return;
+        }
+
+        const eventScore = Number(message.score);
+        setEvents((prevEvents) => [
+          {
+            username: message.username || 'Guest',
+            score: Number.isFinite(eventScore) ? Math.floor(eventScore) : 0,
+            isHighScore: Boolean(message.isHighScore),
+            date: message.date || '',
+          },
+          ...prevEvents,
+        ].slice(0, 8));
+      } catch (_error) {
+        // Ignore invalid websocket payloads.
+      }
+    };
+
+    return () => {
+      socketRef.current = null;
+      socket.close();
+    };
+  }, []);
+
+  const sendLossEvent = React.useCallback((eventData) => {
+    const socket = socketRef.current;
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return;
+    }
+
+    socket.send(
+      JSON.stringify({
+        type: 'playerLost',
+        username: eventData.username || 'Guest',
+        score: Math.floor(eventData.score ?? 0),
+        isHighScore: Boolean(eventData.isHighScore),
+      }),
+    );
+  }, []);
+
   const checkForPersonalHighScore = async (currentScore) => {
     if (!isLoggedIn) {
       setAuthMessage('Login to save high scores.');
+      sendLossEvent({ username: 'Guest', score: currentScore, isHighScore: false });
       return;
     }
 
@@ -95,11 +145,13 @@ export function Play() {
         setCurrentUser('');
         setPersonalBest(0);
         setAuthMessage('Session expired. Please log in again.');
+        sendLossEvent({ username: currentUser, score: currentScore, isHighScore: false });
         return;
       }
 
       if (!response.ok) {
         setAuthMessage(data.msg || 'Could not save score.');
+        sendLossEvent({ username: currentUser, score: currentScore, isHighScore: false });
         return;
       }
 
@@ -109,10 +161,16 @@ export function Play() {
       } else {
         setAuthMessage('No new personal high score.');
       }
+      sendLossEvent({
+        username: currentUser,
+        score: currentScore,
+        isHighScore: Boolean(data.isNewPersonalBest),
+      });
 
       loadLeaderboard();
     } catch (error) {
       setAuthMessage('Could not reach server to save score.');
+      sendLossEvent({ username: currentUser, score: currentScore, isHighScore: false });
     }
   };
 
@@ -171,11 +229,12 @@ function HighScoreNotifications({ events }) {
       {events.length ? (
         events.map((event, index) => (
           <div key={`${event.username}-${event.date}-${index}`}>
-            {event.username} high score: {event.score}
+            {event.username} lost at {event.score}
+            {event.isHighScore ? ' (new personal high score)' : ''}
           </div>
         ))
       ) : (
-        <div>No recent high scores.</div>
+        <div>No recent losses.</div>
       )}
     </div>
   );
