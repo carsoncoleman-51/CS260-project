@@ -93,7 +93,7 @@ export function Play() {
         const eventScore = Number(message.score);
         setEvents((prevEvents) => [
           {
-            username: message.username || 'Guest',
+            username: typeof message.username === 'string' && message.username.trim() ? message.username.trim() : 'Guest',
             score: Number.isFinite(eventScore) ? Math.floor(eventScore) : 0,
             isHighScore: Boolean(message.isHighScore),
             date: message.date || '',
@@ -120,8 +120,8 @@ export function Play() {
     socket.send(
       JSON.stringify({
         type: 'playerLost',
-        username: eventData.username || 'Guest',
-        score: Math.floor(eventData.score ?? 0),
+        username: typeof eventData.username === 'string' && eventData.username.trim() ? eventData.username.trim() : 'Guest',
+        score: Number.isFinite(Number(eventData.score)) ? Math.max(0, Math.floor(Number(eventData.score))) : 0,
         isHighScore: Boolean(eventData.isHighScore),
       }),
     );
