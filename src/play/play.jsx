@@ -79,13 +79,14 @@ export function Play() {
   React.useEffect(() => {
     const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss'; //taken from class code, decides which type of connection
     const socketHost =
-      window.location.hostname === 'localhost' ? 'localhost:4000' : window.location.host;
+      ['localhost', '127.0.0.1'].includes(window.location.hostname) ? 'localhost:4000' : window.location.host;
+    // Keep websocket traffic on backend port during local development.
     const socket = new WebSocket(`${protocol}://${socketHost}`);
     socketRef.current = socket;
 
     socket.onmessage = (event) => {
       try {
-        const message = JSON.parse(event.data);
+        const message = JSON.parse(typeof event.data === 'string' ? event.data : '{}');
         if (message?.type !== 'playerLost') { //only does for playerlost events
           return;
         }
