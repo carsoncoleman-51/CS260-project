@@ -1,5 +1,6 @@
 import React from 'react';
 import './play.css';
+import { fireHighScoreConfetti } from './confetti';
 
 async function readJson(response) {
   try {
@@ -157,16 +158,18 @@ export function Play() {
         return;
       }
 
+      const isNewPersonalBest = Boolean(data.isNewPersonalBest);
       setPersonalBest((prevBest) => data.personalBest ?? prevBest);
-      if (data.isNewPersonalBest) {
+      if (isNewPersonalBest) {
         setAuthMessage(`New personal high score: ${data.personalBest}!`);
+        fireHighScoreConfetti();
       } else {
         setAuthMessage('No new personal high score.');
       } //send ws event about player losing, includes if they got a new personal best or not
       sendLossEvent({
         username: currentUser,
         score: currentScore,
-        isHighScore: Boolean(data.isNewPersonalBest),
+        isHighScore: isNewPersonalBest,
       });
 
       loadLeaderboard();
