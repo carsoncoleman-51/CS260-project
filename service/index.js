@@ -11,7 +11,7 @@ const DB = require('./database');
 const app = express();
 const port = process.argv.length > 2 ? Number(process.argv[2]) : 4000;
 const server = http.createServer(app); //used for both HTTP and WebSocket
-const sockets = new Set(); 
+const sockets = new Set(); // Tracks active WebSocket clients so we can broadcast to everyone.
 
 app.use(express.json());
 app.use(cookieParser());
@@ -61,7 +61,7 @@ wsServer.on('connection', (socket) => { //Used for new connection
     sockets.delete(socket);
   });
 
-  socket.on('error', () => {
+  socket.on('error', () => { // Remove sockets that fail unexpectedly.
     sockets.delete(socket);
   });
 });
@@ -239,16 +239,16 @@ function cookieOptions() {
   };
 }
 
-function broadcast(event) {
+function broadcast(event) { // Sends a WebSocket event to all currently connected clients.
   const payload = JSON.stringify(event);
   for (const socket of sockets) {
-    if (socket.readyState !== WebSocket.OPEN) {
+    if (socket.readyState !== WebSocket.OPEN) { // Skip and clean up sockets that are no longer open.
       sockets.delete(socket);
       continue;
     }
 
     try {
-      socket.send(payload);
+      socket.send(payload); // Deliver the event payload to this connected client.
     } catch (_error) {
       sockets.delete(socket);
       try {
