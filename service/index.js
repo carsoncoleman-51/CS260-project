@@ -242,8 +242,20 @@ function cookieOptions() {
 function broadcast(event) {
   const payload = JSON.stringify(event);
   for (const socket of sockets) {
-    if (socket.readyState === WebSocket.OPEN) {
+    if (socket.readyState !== WebSocket.OPEN) {
+      sockets.delete(socket);
+      continue;
+    }
+
+    try {
       socket.send(payload);
+    } catch (_error) {
+      sockets.delete(socket);
+      try {
+        socket.terminate();
+      } catch (_terminateError) {
+        // Ignore terminate failures while cleaning up dead sockets.
+      }
     }
   }
 }

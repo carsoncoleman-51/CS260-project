@@ -20,6 +20,7 @@ export function Play() {
   const [isCelebrating, setIsCelebrating] = React.useState(false);
   const [events, setEvents] = React.useState([]);
   const socketRef = React.useRef(null); //so this is more beneficial cuz provides a way to store mutable values that persist across component re-renders without triggering a re-render when the value changes
+  const reconnectTimerRef = React.useRef(null);
   const celebrationTimerRef = React.useRef(null);
 
   const loadCurrentUser = React.useCallback(async () => {
@@ -102,38 +103,74 @@ export function Play() {
 
   //starts up when componet first loads
   React.useEffect(() => {
-    const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss'; //taken from class code, decides which type of connection
-    const socketHost =
-      ['localhost', '127.0.0.1'].includes(window.location.hostname) ? 'localhost:4000' : window.location.host;
-    // Keep websocket traffic on backend port during local development.
-    const socket = new WebSocket(`${protocol}://${socketHost}`);
-    socketRef.current = socket;
+    let isUnmounted = false;
 
-    socket.onmessage = (event) => {
-      try {
-        const message = JSON.parse(typeof event.data === 'string' ? event.data : '{}');
-        if (message?.type !== 'playerLost') { //only does for playerlost events
-          return;
+    const connectSocket = () => {
+      if (isUnmounted) {
+        return;
+      }
+
+      const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss'; //taken from class code, decides which type of connection
+      const socketHost =
+        ['localhost', '127.0.0.1'].includes(window.location.hostname) ? 'localhost:4000' : window.location.host;
+      // Keep websocket traffic on backend port during local development.
+      const socket = new WebSocket(`${protocol}://${socketHost}`);
+      socketRef.current = socket;
+
+      socket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(typeof event.data === 'string' ? event.data : '{}');
+          if (message?.type !== 'playerLost') { //only does for playerlost events
+            return;
+          }
+
+          const eventScore = Number(message.score);
+          setEvents((prevEvents) => [
+            {
+              username: typeof message.username === 'string' && message.username.trim() ? message.username.trim() : 'Guest',
+              score: Number.isFinite(eventScore) ? Math.floor(eventScore) : 0,
+              isHighScore: Boolean(message.isHighScore),
+              date: message.date || '',
+            },
+            ...prevEvents,
+          ].slice(0, 8));
+        } catch (_error) {
+          // Ignore invalid websocket payloads.
+        }
+      };
+
+      socket.onclose = () => {
+        if (socketRef.current === socket) {
+          socketRef.current = null;
         }
 
-        const eventScore = Number(message.score);
-        setEvents((prevEvents) => [
-          {
-            username: typeof message.username === 'string' && message.username.trim() ? message.username.trim() : 'Guest',
-            score: Number.isFinite(eventScore) ? Math.floor(eventScore) : 0,
-            isHighScore: Boolean(message.isHighScore),
-            date: message.date || '',
-          },
-          ...prevEvents,
-        ].slice(0, 8));
-      } catch (_error) {
-        // Ignore invalid websocket payloads.
-      }
+        if (!isUnmounted && !reconnectTimerRef.current) {
+          reconnectTimerRef.current = setTimeout(() => {
+            reconnectTimerRef.current = null;
+            connectSocket();
+          }, 1500);
+        }
+      };
+
+      socket.onerror = () => {
+        socket.close();
+      };
     };
-//close socket
+
+    connectSocket();
+
+    //close socket
     return () => {
-      socketRef.current = null;
-      socket.close();
+      isUnmounted = true;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
+
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
     };
   }, []);
 
