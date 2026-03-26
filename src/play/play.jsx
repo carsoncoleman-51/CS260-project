@@ -17,8 +17,10 @@ export function Play() {
   const [score, setScore] = React.useState(0);
   const [authMessage, setAuthMessage] = React.useState('');
   const [personalBest, setPersonalBest] = React.useState(0);
+  const [isCelebrating, setIsCelebrating] = React.useState(false);
   const [events, setEvents] = React.useState([]);
   const socketRef = React.useRef(null); //so this is more beneficial cuz provides a way to store mutable values that persist across component re-renders without triggering a re-render when the value changes
+  const celebrationTimerRef = React.useRef(null);
 
   const loadCurrentUser = React.useCallback(async () => {
     try {
@@ -75,6 +77,28 @@ export function Play() {
 
     return () => clearInterval(id);
   }, [loadLeaderboard]);
+
+  React.useEffect(() => {
+    return () => {
+      if (celebrationTimerRef.current) {
+        clearTimeout(celebrationTimerRef.current);
+      }
+    };
+  }, []);
+
+  const triggerHighScoreCelebration = React.useCallback(() => {
+    fireHighScoreConfetti();
+    setIsCelebrating(true);
+
+    if (celebrationTimerRef.current) {
+      clearTimeout(celebrationTimerRef.current);
+    }
+
+    celebrationTimerRef.current = setTimeout(() => {
+      setIsCelebrating(false);
+      celebrationTimerRef.current = null;
+    }, 2200);
+  }, []);
 
   //starts up when componet first loads
   React.useEffect(() => {
@@ -162,9 +186,10 @@ export function Play() {
       setPersonalBest((prevBest) => data.personalBest ?? prevBest);
       if (isNewPersonalBest) {
         setAuthMessage(`New personal high score: ${data.personalBest}!`);
-        fireHighScoreConfetti();
+        triggerHighScoreCelebration();
       } else {
         setAuthMessage('No new personal high score.');
+        setIsCelebrating(false);
       } //send ws event about player losing, includes if they got a new personal best or not
       sendLossEvent({
         username: currentUser,
@@ -196,6 +221,7 @@ export function Play() {
         score={score}
         personalBest={personalBest}
         authMessage={authMessage}
+        isCelebrating={isCelebrating}
         onButtonPush={buttonPush}
       />
       <HighScoreNotifications events={events} />
@@ -203,7 +229,7 @@ export function Play() {
   );
 }
 
-function PlayerPanel({ currentUser, isLoggedIn, score, personalBest, authMessage, onButtonPush }) {
+function PlayerPanel({ currentUser, isLoggedIn, score, personalBest, authMessage, isCelebrating, onButtonPush }) {
   return (
     <>
       <div className="player-meta">
@@ -223,7 +249,7 @@ function PlayerPanel({ currentUser, isLoggedIn, score, personalBest, authMessage
         <span className="red-button-top" onClick={onButtonPush}></span>
       </div>
 
-      {authMessage ? <div className="login-message">{authMessage}</div> : null}
+      {authMessage ? <div className={`login-message${isCelebrating ? ' login-message-celebrate' : ''}`}>{authMessage}</div> : null}
     </>
   );
 }

@@ -36,6 +36,12 @@
   letter-spacing: 0.4px;
 }
 
+.play-view .login-message {
+  font-size: clamp(14px, 2.3vw, 18px);
+  font-weight: 700;
+  text-align: center;
+}
+
 .play-view .save-status {
   font-size: clamp(13px, 2.2vw, 16px);
   letter-spacing: 0.3px;
@@ -81,4 +87,15 @@
 
 .red-button:hover {
   animation: shake 0.25s infinite;
+}
+
+@keyframes celebratePulse {
+  0% { transform: scale(1); color: #101010; }
+  40% { transform: scale(1.06); color: #ffe45c; }
+  70% { transform: scale(1.03); color: #ffd60a; }
+  100% { transform: scale(1); color: #101010; }
+}
+
+.play-view .login-message-celebrate {
+  animation: celebratePulse 0.7s ease-in-out 3;
 }
