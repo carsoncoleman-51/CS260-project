@@ -105,7 +105,7 @@ export function Play() {
   React.useEffect(() => {
     let isUnmounted = false;
 
-    const connectSocket = () => {
+    const connectSocket = () => { // Creates a WebSocket and is reused for reconnect attempts.
       if (isUnmounted) {
         return;
       }
@@ -139,7 +139,7 @@ export function Play() {
         }
       };
 
-      socket.onclose = () => {
+      socket.onclose = () => { // Clears the current socket and schedules a delayed reconnect.
         if (socketRef.current === socket) {
           socketRef.current = null;
         }
@@ -152,7 +152,7 @@ export function Play() {
         }
       };
 
-      socket.onerror = () => {
+      socket.onerror = () => { // Force close so reconnect logic consistently runs in onclose.
         socket.close();
       };
     };
