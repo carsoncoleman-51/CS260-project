@@ -125,10 +125,15 @@ export function Play() {
           }
 
           const eventScore = Number(message.score);
+          const normalizedScore = Number.isFinite(eventScore) ? Math.floor(eventScore) : 0;
+          if (normalizedScore <= 0) {
+            return;
+          }
+
           setEvents((prevEvents) => [
             {
               username: typeof message.username === 'string' && message.username.trim() ? message.username.trim() : 'Guest',
-              score: Number.isFinite(eventScore) ? Math.floor(eventScore) : 0,
+              score: normalizedScore,
               isHighScore: Boolean(message.isHighScore),
               date: message.date || '',
             },
@@ -179,12 +184,17 @@ export function Play() {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       return; //stops if cant send
     }
+
+    const normalizedScore = Number.isFinite(Number(eventData.score)) ? Math.floor(Number(eventData.score)) : 0;
+    if (normalizedScore <= 0) {
+      return;
+    }
 //sends out ws to server with player lost event, includes username, score, and if its a high score or not
     socket.send(
       JSON.stringify({
         type: 'playerLost',
         username: typeof eventData.username === 'string' && eventData.username.trim() ? eventData.username.trim() : 'Guest',
-        score: Number.isFinite(Number(eventData.score)) ? Math.max(0, Math.floor(Number(eventData.score))) : 0,
+        score: normalizedScore,
         isHighScore: Boolean(eventData.isHighScore),
       }),
     );

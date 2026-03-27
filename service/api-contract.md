@@ -118,6 +118,7 @@ This is the agreed contract between the React frontend and the backend service.
 - Behavior:
   - Saves only if submitted score is higher than existing personal best
   - Updates date only when a new personal best is saved
+  - Rejects scores above the configured server max (`MAX_ACCEPTED_SCORE`, default `1000`)
 - Errors:
   - `400` if score is missing or invalid
   - `401` if not authenticated

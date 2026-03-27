@@ -12,6 +12,7 @@ const app = express();
 const port = process.argv.length > 2 ? Number(process.argv[2]) : 4000;
 const server = http.createServer(app); //used for both HTTP and WebSocket
 const sockets = new Set(); // Tracks active WebSocket clients so we can broadcast to everyone.
+const MAX_ACCEPTED_SCORE = parsePositiveInteger(process.env.MAX_ACCEPTED_SCORE, 1000);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -37,7 +38,12 @@ wsServer.on('connection', (socket) => { //Used for new connection
     }
 
     const score = Number(message.score);
-    if (!Number.isFinite(score) || score < 0) {
+    if (!Number.isFinite(score)) {
+      return;
+    }
+
+    const normalizedScore = Math.floor(score);
+    if (normalizedScore <= 0 || normalizedScore > MAX_ACCEPTED_SCORE) {
       return;
     }
 
@@ -49,7 +55,7 @@ wsServer.on('connection', (socket) => { //Used for new connection
           ? message.username.trim()
           : 'Guest',
           //make score into int
-      score: Math.floor(score),
+      score: normalizedScore,
       // Normalize truthy/falsy values to a boolean.
       isHighScore: Boolean(message.isHighScore),
       // Attach today's date so clients can display when it happened cuz why not.
@@ -119,7 +125,7 @@ app.get('/api/user/me', requireAuth, (req, res) => {
 });
 
 app.get('/api/scores', async (_req, res) => {
-  const scores = await DB.getLeaderboard(10);
+  const scores = await DB.getLeaderboard(10, MAX_ACCEPTED_SCORE);
   res.send({ scores });
 });
 
@@ -131,6 +137,11 @@ app.post('/api/scores', requireAuth, async (req, res) => {
   }
 
   const submittedScore = Math.floor(rawScore);
+  if (submittedScore > MAX_ACCEPTED_SCORE) {
+    res.status(400).send({ msg: `Score exceeds the allowed maximum (${MAX_ACCEPTED_SCORE})` });
+    return;
+  }
+
   let isNewPersonalBest = false;
 
   if (submittedScore > (req.user.score ?? 0)) {
@@ -260,6 +271,23 @@ function broadcast(event) { // Sends a WebSocket event to all currently connecte
   }
 }
 
-server.listen(port, () => {
+function parsePositiveInteger(rawValue, fallbackValue) {
+  const parsedValue = Number(rawValue);
+  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+    return fallbackValue;
+  }
+
+  return parsedValue;
+}
+
+server.listen(port, async () => {
   console.log(`Backend service listening on port ${port}`);
+  try {
+    const resetCount = await DB.resetScoresAbove(MAX_ACCEPTED_SCORE);
+    if (resetCount > 0) {
+      console.log(`Reset ${resetCount} invalid score(s) above ${MAX_ACCEPTED_SCORE}.`);
+    }
+  } catch (error) {
+    console.log(`Unable to reset invalid scores because ${error.message}`);
+  }
 });
